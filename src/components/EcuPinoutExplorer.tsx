@@ -25,19 +25,22 @@ import {
   Camera,
   Maximize2,
   Crosshair,
-  Check
+  Check,
+  Box
 } from 'lucide-react';
 
 import densoHeaderImg from '../assets/images/ecu_denso_header_1794333481637.jpg';
 import transtronHeaderImg from '../assets/images/ecu_transtron_header_1794333480671.jpg';
 import continentalHeaderImg from '../assets/images/ecu_continental_header_1794333480989.jpg';
 import benchProbeGuideImg from '../assets/images/ecu_bench_pin_probe_guide_1794333496324.jpg';
+import { Connector3D } from './Connector3D';
 
 interface EcuPinoutExplorerProps {
   vehicle: VehicleProfile;
   selectedPinNumber: number | null;
   onSelectPin: (pinNumber: number) => void;
   onSendToBench?: (pinNumber: number) => void;
+  onHighlightInWiring?: (pinNumberA: number, pinNumberB: number) => void;
 }
 
 // Wire color code parser with exact visual swatches
@@ -71,14 +74,16 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
   selectedPinNumber,
   onSelectPin,
   onSendToBench,
+  onHighlightInWiring,
 }) => {
   const [selectedConnectorId, setSelectedConnectorId] = useState<string>(
     vehicle.connectors[0]?.id || ''
   );
   const [viewOrientation, setViewOrientation] = useState<'RECEPTACLE' | 'HARNESS_PLUG'>('RECEPTACLE');
-  const [visualDisplayMode, setVisualDisplayMode] = useState<'HARDWARE_PHOTO' | 'PROBE_GUIDE_PHOTO' | 'CAVITY_MATRIX'>('HARDWARE_PHOTO');
+  const [visualDisplayMode, setVisualDisplayMode] = useState<'HARDWARE_PHOTO' | 'PROBE_GUIDE_PHOTO' | 'CAVITY_MATRIX' | 'CONNECTOR_3D'>('HARDWARE_PHOTO');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [signalFilter, setSignalFilter] = useState<string>('ALL');
+  const [continuityTargetPinNum, setContinuityTargetPinNum] = useState<number>(2);
 
   // Interactive Live Pin Electrical Simulator state
   const [simPowerOn, setSimPowerOn] = useState<boolean>(true);
@@ -99,6 +104,7 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
 
   const activeConnector =
     vehicle.connectors.find((c) => c.id === selectedConnectorId) || vehicle.connectors[0];
+
 
   const allPins = vehicle.connectors.flatMap((c) => c.pins);
   const selectedPin = allPins.find((p) => p.pinNumber === selectedPinNumber && p.connectorId === activeConnector?.id) || 
@@ -176,10 +182,10 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
       ctx.clearRect(0, 0, w, h);
 
       // Grid lines
-      ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+      ctx.strokeStyle = '#1e293b'; // Darker grid
       ctx.lineWidth = 1;
       ctx.beginPath();
-      for (let x = 0; x < w; x += 20) {
+      for (let x = 0; x < w; x += 40) {
         ctx.moveTo(x, 0); ctx.lineTo(x, h);
       }
       for (let y = 0; y < h; y += 15) {
@@ -187,23 +193,37 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
       }
       ctx.stroke();
 
+      // Horizontal center line
+      ctx.strokeStyle = '#334155';
+      ctx.beginPath();
+      ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+      ctx.stroke();
+
       if (!simPowerOn || !selectedPin || !selectedPin.isPopulated || selectedPin.signalType === 'RESERVED_NC') {
-        // Flat zero line
-        ctx.strokeStyle = '#64748b';
-        ctx.lineWidth = 2;
+        // Flat zero line with slight noise
+        ctx.strokeStyle = '#ef4444'; // Red for dead
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.moveTo(0, h - 10);
-        ctx.lineTo(w, h - 10);
+        for (let x = 0; x < w; x++) {
+          const noise = (Math.random() - 0.5) * 0.5;
+          const y = h - 10 + noise;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
         ctx.stroke();
         return;
       }
 
-      ctx.strokeStyle = '#06b6d4'; // cyan waveform
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-
       const measuredV = simResult.multimeter.value ?? 0;
       const baselineY = h - Math.min(h - 10, Math.max(10, (measuredV / 15) * (h - 20) + 10));
+
+      // Trace Glow Effect
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = '#00C2FF';
+      ctx.strokeStyle = '#00C2FF'; 
+      ctx.lineWidth = 2;
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
 
       if (selectedPin.signalType === 'ACTUATOR_LOW_SIDE' || selectedPin.label.includes('SCV') || selectedPin.label.includes('INJ')) {
         // PWM / Pulse waveform
@@ -211,7 +231,8 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
         const dutyRatio = 0.35;
         for (let x = 0; x < w; x++) {
           const phase = (x + time * 40) % period;
-          const y = phase < period * dutyRatio ? h - 35 : h - 10;
+          const jitter = (Math.random() - 0.5) * 0.8;
+          const y = (phase < period * dutyRatio ? h - 35 : h - 10) + jitter;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -219,7 +240,8 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
         // Inductive VR sine wave
         const freq = (simRpm / 60) * 0.15;
         for (let x = 0; x < w; x++) {
-          const y = baselineY + Math.sin(x * 0.1 + time * freq * 10) * 12;
+          const jitter = (Math.random() - 0.5) * 0.4;
+          const y = baselineY + Math.sin(x * 0.1 + time * freq * 10) * 12 + jitter;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -228,15 +250,15 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
         const period = 15;
         for (let x = 0; x < w; x++) {
           const phase = (x + time * 60) % period;
-          const noise = Math.sin(x * 0.8) * 2;
-          const y = phase < 7 ? baselineY - 8 + noise : baselineY + 8 + noise;
+          const noise = (Math.random() - 0.5) * 2;
+          const y = (phase < 7 ? baselineY - 8 : baselineY + 8) + noise;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
       } else {
         // Flat DC level with slight analog ripple
         for (let x = 0; x < w; x++) {
-          const ripple = (Math.sin(x * 0.1 + time * 5) * 0.8) + (Math.random() * 0.4);
+          const ripple = (Math.sin(x * 0.1 + time * 5) * 0.8) + (Math.random() * 0.6);
           const y = baselineY + ripple;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
@@ -244,6 +266,7 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
       }
 
       ctx.stroke();
+      ctx.shadowBlur = 0; // Reset shadow for next frame
       animId = requestAnimationFrame(render);
     };
 
@@ -385,6 +408,17 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
             >
               <Layers className="w-3.5 h-3.5" />
               <span>Cavity Grid</span>
+            </button>
+            <button
+              onClick={() => setVisualDisplayMode('CONNECTOR_3D')}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors ${
+                visualDisplayMode === 'CONNECTOR_3D'
+                  ? 'bg-workstation-accent/20 text-workstation-accent font-bold border border-workstation-accent/50'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Box className="w-3.5 h-3.5" />
+              <span>3D Virtual Port</span>
             </button>
           </div>
 
@@ -626,14 +660,22 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
                 <div className="flex flex-wrap gap-2 sm:gap-2.5 justify-center py-4 bg-slate-900/60 p-3 sm:p-5 rounded-xl border border-slate-800/80">
                   {displayPins.map((pin) => {
                     const isSelected = selectedPin?.pinNumber === pin.pinNumber;
+                    const matchesSearch = searchQuery.trim() !== '' && (
+                      pin.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      pin.functionDesc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      pin.signalType.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+
+                    let btnClass = getPinCircleColor(pin, isSelected);
+                    if (matchesSearch && !isSelected) {
+                      btnClass = 'bg-cyan-500/30 border-cyan-400 text-cyan-200 ring-2 ring-cyan-400 font-bold animate-pulse scale-105 z-10';
+                    }
+
                     return (
                       <button
                         key={`${pin.connectorId}-${pin.pinNumber}`}
                         onClick={() => onSelectPin(pin.pinNumber)}
-                        className={`w-10 h-10 sm:w-11 sm:h-11 rounded-lg border flex flex-col items-center justify-center transition-all ${getPinCircleColor(
-                          pin,
-                          isSelected
-                        )}`}
+                        className={`w-10 h-10 sm:w-11 sm:h-11 rounded-lg border flex flex-col items-center justify-center transition-all ${btnClass}`}
                         title={`${pin.label} (Pin #${pin.pinNumber}): ${pin.functionDesc}`}
                       >
                         <span className="text-[10px] font-mono font-bold leading-none">
@@ -642,6 +684,54 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
                         <span className="text-[8px] font-mono tracking-tighter truncate max-w-[36px] leading-tight mt-0.5">
                           {!pin.isPopulated || pin.signalType === 'RESERVED_NC' ? 'NC' : pin.label.split(' ')[0]}
                         </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* VISUAL DISPLAY MODE 4: 3D INTERACTIVE ECU CONNECTOR PORT */}
+          {visualDisplayMode === 'CONNECTOR_3D' && activeConnector && (
+            <div className="mb-6">
+              <Connector3D 
+                connector={activeConnector}
+                selectedPinNumber={selectedPinNumber}
+                onSelectPin={onSelectPin}
+                orientation={viewOrientation}
+                searchQuery={searchQuery}
+              />
+              
+              {/* Connector Selector Tabs for 3D View */}
+              <div className="mt-4 p-4 bg-workstation-panel border border-white/5 rounded-xl">
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-2 font-bold">
+                  Select ECU Header Socket (3D):
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {vehicle.connectors.map((conn) => {
+                    const isActive = selectedConnectorId === conn.id;
+                    return (
+                      <button
+                        key={conn.id}
+                        onClick={() => setSelectedConnectorId(conn.id)}
+                        className={`p-3 rounded-xl border flex flex-col justify-between transition-all text-left ${
+                          isActive
+                            ? 'bg-workstation-bg border-workstation-accent ring-2 ring-workstation-accent/40 shadow-lg'
+                            : 'bg-white/5 border-white/5 hover:bg-white/10'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold font-mono text-white">{conn.name}</span>
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              isActive ? 'bg-workstation-accent animate-ping' : 'bg-slate-600'
+                            }`}
+                          />
+                        </div>
+                        <div className="mt-1 text-[10px] font-mono text-slate-400">
+                          {conn.pinCount} Pins · {conn.receptacleType}
+                        </div>
                       </button>
                     );
                   })}
@@ -702,7 +792,7 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
               <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search pin name, function, or pin #..."
+                placeholder="Cross-reference component (e.g. Fuel Injector, Rail Pressure, CKP)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-950 border border-slate-800 rounded-md text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"
@@ -980,6 +1070,94 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
                     </span>
                   </div>
                 )}
+              </div>
+
+              {/* Continuity Test & Probe Check Card */}
+              <div className="bg-workstation-bg p-4 rounded-xl border-2 border-emerald-500/40 shadow-xl space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="font-mono text-xs font-bold text-white uppercase">
+                      Continuity Test (Dual-Probe)
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
+                    DMM MODE
+                  </span>
+                </div>
+
+                {(() => {
+                  const targetPinObj = allPins.find(p => p.pinNumber === continuityTargetPinNum);
+                  const isSameGroup = selectedPin && targetPinObj && (
+                    selectedPin.signalType === targetPinObj.signalType ||
+                    (selectedPin.signalType.includes('GROUND') && targetPinObj.signalType.includes('GROUND')) ||
+                    (selectedPin.signalType.includes('POWER') && targetPinObj.signalType.includes('POWER'))
+                  );
+                  const isCanBus = selectedPin && targetPinObj && (
+                    (selectedPin.signalType === 'CAN_HIGH' && targetPinObj.signalType === 'CAN_LOW') ||
+                    (selectedPin.signalType === 'CAN_LOW' && targetPinObj.signalType === 'CAN_HIGH')
+                  );
+
+                  const resistance = selectedPin?.pinNumber === continuityTargetPinNum
+                    ? '0.05 Ω'
+                    : isSameGroup
+                    ? '0.12 Ω'
+                    : isCanBus
+                    ? '120.0 Ω'
+                    : 'OL (Open Circuit)';
+
+                  const status = selectedPin?.pinNumber === continuityTargetPinNum
+                    ? 'PASS (Same Terminal)'
+                    : isSameGroup
+                    ? 'PASS (Continuous Circuit / Ground Plane)'
+                    : isCanBus
+                    ? 'PASS (CAN Bus Line Termination)'
+                    : 'OPEN CIRCUIT (No Continuity)';
+
+                  return (
+                    <div className="space-y-2 text-xs font-mono">
+                      <div className="flex justify-between items-center bg-slate-950 p-2 rounded border border-slate-800">
+                        <span className="text-slate-400">Probe 1 (Red):</span>
+                        <span className="text-cyan-400 font-bold">Pin #{selectedPin.pinNumber} ({selectedPin.label})</span>
+                      </div>
+
+                      <div className="space-y-1">
+                        <span className="text-slate-400 text-[11px]">Probe 2 (Black) Target:</span>
+                        <select
+                          value={continuityTargetPinNum}
+                          onChange={(e) => setContinuityTargetPinNum(Number(e.target.value))}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 font-mono"
+                        >
+                          {allPins.map(p => (
+                            <option key={`cont-${p.connectorId}-${p.pinNumber}`} value={p.pinNumber}>
+                              Pin #{p.pinNumber} - {p.label} ({p.connectorName})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-center space-y-1">
+                        <span className="text-[10px] text-slate-500 uppercase block">Calculated Resistance</span>
+                        <span className="text-2xl font-bold font-mono text-emerald-400">
+                          {resistance}
+                        </span>
+                        <span className="text-[10px] font-mono block text-slate-400">
+                          {status}
+                        </span>
+                      </div>
+
+                      {onHighlightInWiring && (
+                        <button
+                          onClick={() => onHighlightInWiring(selectedPin.pinNumber, continuityTargetPinNum)}
+                          className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-workstation-accent hover:bg-workstation-accent-light text-workstation-bg font-bold rounded-lg transition-all text-xs shadow-md"
+                        >
+                          <Zap className="w-3.5 h-3.5" />
+                          <span>Highlight Path in Wiring Diagram</span>
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Test Instructions */}

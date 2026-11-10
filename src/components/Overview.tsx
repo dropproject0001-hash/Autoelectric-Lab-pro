@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { VehicleProfile, BenchReading } from '../types/automotive';
 
+import { CircuitThermalHeatmap } from './CircuitThermalHeatmap';
+
 interface OverviewProps {
   vehicle: VehicleProfile;
   readings: BenchReading[];
@@ -76,14 +78,20 @@ export const Overview: React.FC<OverviewProps> = ({ vehicle, readings, onNavigat
             </h3>
             <div className="space-y-3">
               {[
-                { label: 'Cloud AI Core', status: 'Optimal', color: 'text-status-success' },
-                { label: 'Local Database', status: 'Synced', color: 'text-status-success' },
-                { label: 'Physics Engine', status: 'Calibrated', color: 'text-status-success' },
-                { label: 'Security Module', status: 'Encrypted', color: 'text-status-info' },
+                { label: 'Cloud AI Core', status: 'Optimal', color: 'text-status-success', val: '24ms' },
+                { label: 'Local Database', status: 'Synced', color: 'text-status-success', val: '124k Rec' },
+                { label: 'Physics Engine', status: 'Calibrated', color: 'text-status-success', val: '60Hz' },
+                { label: 'Security Module', status: 'Encrypted', color: 'text-status-info', val: 'AES-256' },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400">{item.label}</span>
-                  <span className={`font-mono font-bold ${item.color}`}>{item.status}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-slate-700" />
+                    <span className="text-slate-400">{item.label}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-mono text-slate-600 uppercase">{item.val}</span>
+                    <span className={`font-mono font-bold ${item.color}`}>{item.status}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -125,6 +133,13 @@ export const Overview: React.FC<OverviewProps> = ({ vehicle, readings, onNavigat
           })}
         </div>
       </section>
+
+      {/* Thermal Heatmap Section */}
+      {vehicle.thermalComponents && vehicle.thermalComponents.length > 0 && (
+        <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <CircuitThermalHeatmap vehicle={vehicle} components={vehicle.thermalComponents} />
+        </section>
+      )}
 
       {/* Recent Activity & Quick Metrics */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">

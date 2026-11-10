@@ -132,6 +132,8 @@ export interface VehicleProfile {
   provenance?: TechnicalProvenanceSource;
   provenanceDetails?: ProvenanceRecord;
   completenessReports: ConnectorCompleteness[];
+  thermalComponents?: PcbComponentThermal[];
+  referenceReadings?: ReferenceReading[];
 }
 
 export interface WiringNode {
@@ -154,6 +156,18 @@ export interface WiringTrace {
   nominalVoltage: number;
   currentNormalAmps: number;
   status: 'NORMAL' | 'OPEN' | 'SHORT_GND' | 'SHORT_BATT' | 'HIGH_RESISTANCE';
+}
+
+export interface ReferenceReading {
+  pinNumber: number;
+  connectorId: string;
+  label: string;
+  measurementType: 'VOLTAGE_DC' | 'VOLTAGE_AC' | 'RESISTANCE' | 'DIODE';
+  referenceValue: number;
+  unit: string;
+  tolerancePlus: number;
+  toleranceMinus: number;
+  condition: string;
 }
 
 export interface BenchReading {
@@ -183,6 +197,21 @@ export interface DTCRecord {
   benchTestStep: string;
   componentReadingRef: string;
   severity: 'CRITICAL_NO_START' | 'LIMP_MODE' | 'CHECK_ENGINE_WARNING';
+}
+
+export interface PcbComponentThermal {
+  id: string;
+  designation: string;
+  partNumber: string;
+  x: number; // 0-100 normalized coordinate
+  y: number; // 0-100 normalized coordinate
+  width: number;
+  height: number;
+  nominalPowerDissipation: number; // Watts
+  currentPowerDissipation: number; // Watts (simulated)
+  maxSafeTemp: number; // Celsius
+  currentTemp: number; // Celsius (simulated)
+  functionRole: string;
 }
 
 export interface PCBComponent {

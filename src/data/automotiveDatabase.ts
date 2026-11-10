@@ -28,6 +28,21 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
       { connectorId: 'conn-c', connectorName: 'Connector C (35-Pin Power & Ignition)', totalCavities: 35, populatedCount: 24, verifiedCount: 24, unverifiedCount: 0, blankCount: 11, completenessPct: 100.0 },
       { connectorId: 'conn-d', connectorName: 'Connector D (26-Pin CAN & Network)', totalCavities: 26, populatedCount: 18, verifiedCount: 18, unverifiedCount: 0, blankCount: 8, completenessPct: 100.0 },
     ],
+    thermalComponents: [
+      { id: 'mcu-1', designation: 'IC101', partNumber: 'Renesas SH72544R', x: 50, y: 50, width: 20, height: 20, nominalPowerDissipation: 1.2, currentPowerDissipation: 1.15, maxSafeTemp: 125, currentTemp: 52, functionRole: 'Main Engine Management MCU' },
+      { id: 'inj-driver-1', designation: 'IC401', partNumber: 'Denso D6244X', x: 20, y: 30, width: 15, height: 12, nominalPowerDissipation: 4.5, currentPowerDissipation: 3.8, maxSafeTemp: 150, currentTemp: 78, functionRole: 'Piezo Injector High-Voltage Driver' },
+      { id: 'ps-reg-1', designation: 'IC201', partNumber: 'ST L9780', x: 80, y: 20, width: 10, height: 10, nominalPowerDissipation: 2.8, currentPowerDissipation: 2.4, maxSafeTemp: 135, currentTemp: 65, functionRole: 'Main Power Management & 5V Regulator' },
+      { id: 'can-tranceiver', designation: 'IC301', partNumber: 'NXP TJA1042', x: 85, y: 80, width: 6, height: 6, nominalPowerDissipation: 0.4, currentPowerDissipation: 0.35, maxSafeTemp: 125, currentTemp: 45, functionRole: 'High-Speed CAN Transceiver' },
+      { id: 'mosfet-scv', designation: 'Q501', partNumber: 'IRFR5305', x: 25, y: 70, width: 8, height: 8, nominalPowerDissipation: 1.5, currentPowerDissipation: 1.2, maxSafeTemp: 175, currentTemp: 58, functionRole: 'SCV Low-Side Control MOSFET' },
+      { id: 'h-bridge-throttle', designation: 'IC601', partNumber: 'Infineon TLE9201', x: 50, y: 15, width: 12, height: 10, nominalPowerDissipation: 3.2, currentPowerDissipation: 2.9, maxSafeTemp: 150, currentTemp: 72, functionRole: 'Electronic Throttle Body H-Bridge Driver' },
+    ],
+    referenceReadings: [
+      { pinNumber: 1, connectorId: 'conn-c', label: '+B', measurementType: 'VOLTAGE_DC', referenceValue: 13.8, unit: 'V', tolerancePlus: 0.7, toleranceMinus: 1.2, condition: 'Key ON, Engine OFF' },
+      { pinNumber: 1, connectorId: 'conn-b', label: 'VC', measurementType: 'VOLTAGE_DC', referenceValue: 5.002, unit: 'V', tolerancePlus: 0.05, toleranceMinus: 0.05, condition: 'Key ON' },
+      { pinNumber: 3, connectorId: 'conn-b', label: 'PCR', measurementType: 'VOLTAGE_DC', referenceValue: 1.35, unit: 'V', tolerancePlus: 0.2, toleranceMinus: 0.2, condition: 'Idle (380 bar)' },
+      { pinNumber: 8, connectorId: 'conn-a', label: 'SCV-', measurementType: 'VOLTAGE_DC', referenceValue: 9.4, unit: 'V', tolerancePlus: 1.0, toleranceMinus: 1.0, condition: 'Idle (Avg DC)' },
+      { pinNumber: 1, connectorId: 'conn-d', label: 'CAN-H', measurementType: 'RESISTANCE', referenceValue: 120.5, unit: 'Ω', tolerancePlus: 2.0, toleranceMinus: 2.0, condition: 'Power OFF' },
+    ],
     connectors: [
       {
         id: 'conn-a',
@@ -828,6 +843,19 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
       { connectorId: 'isuzu-conn-1', connectorName: 'Connector J1 (94-Pin Body & Power)', totalCavities: 94, populatedCount: 68, verifiedCount: 68, unverifiedCount: 0, blankCount: 26, completenessPct: 100.0 },
       { connectorId: 'isuzu-conn-2', connectorName: 'Connector J2 (60-Pin Engine Sensors)', totalCavities: 60, populatedCount: 48, verifiedCount: 48, unverifiedCount: 0, blankCount: 12, completenessPct: 100.0 },
     ],
+    thermalComponents: [
+      { id: 'isuzu-mcu', designation: 'IC1', partNumber: 'Renesas SH7058', x: 50, y: 50, width: 22, height: 22, nominalPowerDissipation: 1.5, currentPowerDissipation: 1.4, maxSafeTemp: 125, currentTemp: 48, functionRole: 'Heavy Duty Power Management & MCU' },
+      { id: 'isuzu-h-bridge', designation: 'IC502', partNumber: 'Bosch 30620', x: 30, y: 70, width: 14, height: 12, nominalPowerDissipation: 3.5, currentPowerDissipation: 3.2, maxSafeTemp: 150, currentTemp: 82, functionRole: 'Quad-Low Side Switch for ISU Commercial Duty Solenoids' },
+      { id: 'isuzu-can', designation: 'IC402', partNumber: 'PCA82C250', x: 80, y: 85, width: 6, height: 6, nominalPowerDissipation: 0.3, currentPowerDissipation: 0.28, maxSafeTemp: 125, currentTemp: 42, functionRole: 'Isolated CAN Interface' },
+      { id: 'isuzu-ps', designation: 'IC301', partNumber: 'LT3470', x: 20, y: 20, width: 10, height: 8, nominalPowerDissipation: 2.2, currentPowerDissipation: 2.1, maxSafeTemp: 140, currentTemp: 55, functionRole: 'Step-Down Switching Regulator' },
+    ],
+    referenceReadings: [
+      { pinNumber: 1, connectorId: 'isuzu-conn-1', label: 'VBATT', measurementType: 'VOLTAGE_DC', referenceValue: 12.6, unit: 'V', tolerancePlus: 0.8, toleranceMinus: 1.0, condition: 'Key OFF' },
+      { pinNumber: 2, connectorId: 'isuzu-conn-1', label: 'IGN', measurementType: 'VOLTAGE_DC', referenceValue: 13.8, unit: 'V', tolerancePlus: 0.5, toleranceMinus: 1.0, condition: 'Key ON' },
+      { pinNumber: 10, connectorId: 'isuzu-conn-2', label: 'VREF', measurementType: 'VOLTAGE_DC', referenceValue: 5.0, unit: 'V', tolerancePlus: 0.04, toleranceMinus: 0.04, condition: 'Key ON' },
+      { pinNumber: 12, connectorId: 'isuzu-conn-2', label: 'FRP', measurementType: 'VOLTAGE_DC', referenceValue: 1.4, unit: 'V', tolerancePlus: 0.2, toleranceMinus: 0.2, condition: 'Idle (380 bar)' },
+      { pinNumber: 41, connectorId: 'isuzu-conn-1', label: 'CAN_H', measurementType: 'RESISTANCE', referenceValue: 60.2, unit: 'Ω', tolerancePlus: 5.0, toleranceMinus: 5.0, condition: 'Bus Connected' },
+    ],
     connectors: [
       {
         id: 'isuzu-conn-1',
@@ -1141,6 +1169,11 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
     pinoutSource: 'Ford Ranger Technical Wiring Manual 2015 Sec. 303-14',
     provenance: 'OEM_WIRING_DIAGRAM',
     description: 'Continental SID208 engine controller for Ford Ranger and Everest with Siemens/Continental piezo common rail injectors.',
+    referenceReadings: [
+      { pinNumber: 1, connectorId: 'ford-conn-c1', label: 'KL30', measurementType: 'VOLTAGE_DC', referenceValue: 12.6, unit: 'V', tolerancePlus: 0.5, toleranceMinus: 1.0, condition: 'Key OFF' },
+      { pinNumber: 2, connectorId: 'ford-conn-c1', label: 'KL15', measurementType: 'VOLTAGE_DC', referenceValue: 13.8, unit: 'V', tolerancePlus: 0.5, toleranceMinus: 1.0, condition: 'Key ON' },
+      { pinNumber: 23, connectorId: 'ford-conn-c1', label: 'CAN+', measurementType: 'VOLTAGE_DC', referenceValue: 2.65, unit: 'V', tolerancePlus: 0.2, toleranceMinus: 0.2, condition: 'Recessive' },
+    ],
     completenessReports: [
       { connectorId: 'ford-conn-c1', connectorName: 'Connector C1 (96-Pin Engine Bay)', totalCavities: 96, populatedCount: 74, verifiedCount: 74, unverifiedCount: 0, blankCount: 22, completenessPct: 100.0 },
     ],

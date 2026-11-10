@@ -39,6 +39,7 @@ export interface SimulationEnvironment {
     redProbeConnectorId?: string | null;
     blackProbePin: number | null;
     blackProbeConnectorId?: string | null;
+    multiProbes?: { pinNumber: number; connectorId?: string | null }[]; 
   };
   activeFault: ElectricalFault;
   simulatedRPM: number; // 0 - 4500 RPM
@@ -66,6 +67,13 @@ export interface SimulationResult {
     explanation: string;
     nodeVoltageRed: number;
     nodeVoltageBlack: number;
+    multiProbeResults?: {
+      pinNumber: number;
+      label: string;
+      value: number | null;
+      unit: string;
+      evaluation: MeasurementEvaluation;
+    }[];
   };
   waveformCh1: { timeMs: number; voltage: number }[];
   waveformCh2: { timeMs: number; voltage: number }[];
@@ -458,6 +466,29 @@ export function calculateElectricalState(
   const minV1 = Math.min(...v1Values);
   const ch1Vpp = Number((maxV1 - minV1).toFixed(2));
 
+  // 4. Multi-Probe Tracking Calculation
+  let multiProbeResults: SimulationResult['multimeter']['multiProbeResults'] = undefined;
+  if (multimeter.multiProbes && multimeter.multiProbes.length > 0) {
+    multiProbeResults = multimeter.multiProbes.map(probe => {
+      const pin = findPin(vehicle, probe.pinNumber, probe.connectorId);
+      const nodeV = calculateNodeVoltage(pin, actualVoltage, env);
+      const refV = calculateNodeVoltage(blackPin, actualVoltage, env);
+      const diff = nodeV - refV;
+      
+      const evalStatus = pin 
+        ? evaluateVoltageMeasurement(pin, diff, actualVoltage, env, blackPin)
+        : 'INVALID_CONNECTION' as MeasurementEvaluation;
+
+      return {
+        pinNumber: probe.pinNumber,
+        label: pin?.label || 'UNKNOWN',
+        value: Number(diff.toFixed(3)),
+        unit: mmUnit,
+        evaluation: evalStatus
+      };
+    });
+  }
+
   return {
     powerSupply: {
       actualVoltage: Number(actualVoltage.toFixed(2)),
@@ -477,6 +508,7 @@ export function calculateElectricalState(
       explanation,
       nodeVoltageRed: Number(nodeVRed.toFixed(3)),
       nodeVoltageBlack: Number(nodeVBlack.toFixed(3)),
+      multiProbeResults,
     },
     waveformCh1,
     waveformCh2,

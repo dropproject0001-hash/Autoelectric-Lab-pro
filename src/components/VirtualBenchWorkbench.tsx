@@ -27,6 +27,7 @@ import {
   Play,
   Square,
   ShieldAlert,
+  ShieldCheck,
   RotateCw,
   Unplug,
   Key,
@@ -61,8 +62,10 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
   // Connector Orientation (ECU Male Receptacle vs Female Harness Plug Mirrored)
   const [viewOrientation, setViewOrientation] = useState<'RECEPTACLE' | 'HARNESS_PLUG'>('RECEPTACLE');
 
-  // Probe Assignment Target Mode ('RED' or 'BLACK')
-  const [activeProbeTarget, setActiveProbeTarget] = useState<'RED' | 'BLACK'>('RED');
+  // Probe Assignment Target Mode ('RED', 'BLACK', or 'CH1'-'CH4')
+  const [activeProbeTarget, setActiveProbeTarget] = useState<'RED' | 'BLACK' | 'CH1' | 'CH2' | 'CH3' | 'CH4'>('RED');
+  const [multiProbeMode, setMultiProbeMode] = useState<boolean>(false);
+  const [trackedPins, setTrackedPins] = useState<{ pinNumber: number; connectorId: string | null }[]>([]);
 
   // Power Supply State
   const [psVoltageSet, setPsVoltageSet] = useState<number>(13.8);
@@ -96,7 +99,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
   const [scopeRunning, setScopeRunning] = useState<boolean>(true);
   const [scopeTimebaseMs, setScopeTimebaseMs] = useState<number>(5.0);
   const [scopeVoltsPerDiv, setScopeVoltsPerDiv] = useState<number>(5.0);
-  const [activeTab, setActiveTab] = useState<'POWER_DMM' | 'OSCILLOSCOPE' | 'FAULT_INJECTION' | 'GUIDED_TESTS'>('POWER_DMM');
+  const [activeTab, setActiveTab] = useState<'POWER_DMM' | 'MULTI_PROBE' | 'OSCILLOSCOPE' | 'REFERENCE_COMPARE' | 'FAULT_INJECTION' | 'GUIDED_TESTS'>('POWER_DMM');
 
   // Simulation Sliders
   const [simulatedRPM, setSimulatedRPM] = useState<number>(750);
@@ -118,6 +121,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
   const connectorRef = useRef<HTMLDivElement | null>(null);
   const [redProbeCoords, setRedProbeCoords] = useState<{ x: number; y: number } | null>(null);
   const [blackProbeCoords, setBlackProbeCoords] = useState<{ x: number; y: number } | null>(null);
+  const [channelCoords, setChannelCoords] = useState<{ x: number; y: number }[]>([]);
 
   // Dynamic probe wire coordinate calculation
   useEffect(() => {
@@ -125,6 +129,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
       if (!connectorRef.current) return;
       const rect = connectorRef.current.getBoundingClientRect();
 
+      // Legacy Red/Black
       if (redProbePin !== null) {
         const pinEl = connectorRef.current.querySelector(`[data-pin="${redProbePin}"]`);
         if (pinEl) {
@@ -150,13 +155,29 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
       } else {
         setBlackProbeCoords(null);
       }
+
+      // Multi-Channel Coordinates
+      const newChanCoords: { x: number; y: number }[] = [];
+      trackedPins.forEach((tp, i) => {
+        if (tp) {
+          const pinEl = connectorRef.current!.querySelector(`[data-pin="${tp.pinNumber}"]`);
+          if (pinEl) {
+            const pinRect = pinEl.getBoundingClientRect();
+            newChanCoords[i] = {
+              x: pinRect.left - rect.left + pinRect.width / 2,
+              y: pinRect.top - rect.top + pinRect.height / 2,
+            };
+          }
+        }
+      });
+      setChannelCoords(newChanCoords);
     };
 
     updateProbeCoords();
     // Re-calculate on window resize or when probes/view orientation change
     window.addEventListener('resize', updateProbeCoords);
     return () => window.removeEventListener('resize', updateProbeCoords);
-  }, [redProbePin, blackProbePin, viewOrientation, layoutMode]);
+  }, [redProbePin, blackProbePin, trackedPins, viewOrientation, layoutMode]);
 
   // Sync initial pin selection if prop changes
   useEffect(() => {
@@ -186,6 +207,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
       redProbeConnectorId,
       blackProbePin,
       blackProbeConnectorId,
+      multiProbes: multiProbeMode ? trackedPins : [],
     },
     activeFault,
     simulatedRPM,
@@ -208,11 +230,12 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
     let offset = 0;
 
     const render = () => {
+      if (!scopeRunning) return;
       offset = (offset + 1) % 120;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Draw Grid
-      ctx.strokeStyle = 'rgba(34, 197, 94, 0.15)';
+      ctx.strokeStyle = '#1e293b'; // High density workstation grid
       ctx.lineWidth = 1;
 
       const gridSpacingX = canvas.width / 10;
@@ -232,7 +255,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
       }
 
       // Draw Center Ground Line
-      ctx.strokeStyle = 'rgba(34, 197, 94, 0.4)';
+      ctx.strokeStyle = '#334155';
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
       ctx.moveTo(0, canvas.height / 2);
@@ -240,22 +263,24 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
       ctx.stroke();
       ctx.setLineDash([]);
 
+      const midY = canvas.height / 2;
+      const scaleY = (canvas.height / 8) / scopeVoltsPerDiv;
+
       // Draw Channel 1 Waveform (Phosphor Green)
       const pts1 = simResult.waveformCh1;
       if (pts1 && pts1.length > 1) {
-        ctx.strokeStyle = '#22c55e';
-        ctx.lineWidth = 2;
+        ctx.shadowBlur = 8;
         ctx.shadowColor = '#22c55e';
-        ctx.shadowBlur = 4;
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
         ctx.beginPath();
-
-        const midY = canvas.height / 2;
-        const scaleY = (canvas.height / 8) / scopeVoltsPerDiv;
 
         pts1.forEach((pt, idx) => {
           const shiftedIdx = (idx + offset) % pts1.length;
           const px = (idx / (pts1.length - 1)) * canvas.width;
-          const py = midY - (pts1[shiftedIdx]?.voltage || 0) * scaleY;
+          const noise = (Math.random() - 0.5) * 0.8;
+          const py = midY - (pts1[shiftedIdx]?.voltage || 0) * scaleY + noise;
           if (idx === 0) ctx.moveTo(px, py);
           else ctx.lineTo(px, py);
         });
@@ -266,19 +291,18 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
       // Draw Channel 2 Waveform (Cyan)
       const pts2 = simResult.waveformCh2;
       if (pts2 && pts2.length > 1) {
-        ctx.strokeStyle = '#06b6d4';
-        ctx.lineWidth = 1.5;
+        ctx.shadowBlur = 6;
         ctx.shadowColor = '#06b6d4';
-        ctx.shadowBlur = 3;
+        ctx.strokeStyle = '#06b6d4';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
         ctx.beginPath();
-
-        const midY = canvas.height / 2;
-        const scaleY = (canvas.height / 8) / scopeVoltsPerDiv;
 
         pts2.forEach((pt, idx) => {
           const shiftedIdx = (idx + offset) % pts2.length;
           const px = (idx / (pts2.length - 1)) * canvas.width;
-          const py = midY - (pts2[shiftedIdx]?.voltage || 0) * scaleY;
+          const noise = (Math.random() - 0.5) * 0.6;
+          const py = midY - (pts2[shiftedIdx]?.voltage || 0) * scaleY + noise;
           if (idx === 0) ctx.moveTo(px, py);
           else ctx.lineTo(px, py);
         });
@@ -324,9 +348,20 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
     if (activeProbeTarget === 'RED') {
       setRedProbePin(pin.pinNumber);
       setRedProbeConnectorId(pin.connectorId);
-    } else {
+    } else if (activeProbeTarget === 'BLACK') {
       setBlackProbePin(pin.pinNumber);
       setBlackProbeConnectorId(pin.connectorId);
+    } else {
+      // Handle Multi-Probe Channels CH1-CH4
+      const channelIndex = parseInt(activeProbeTarget.replace('CH', '')) - 1;
+      setTrackedPins(prev => {
+        const next = [...prev];
+        next[channelIndex] = { pinNumber: pin.pinNumber, connectorId: pin.connectorId };
+        // Ensure array has up to 4 slots if needed (though usually we just replace)
+        return next;
+      });
+      // Auto-enable multi-probe mode if a channel is assigned
+      setMultiProbeMode(true);
     }
   };
 
@@ -547,31 +582,68 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
 
               {/* Probe Docking Selector & Orientation Controls */}
               <div className="flex flex-wrap items-center gap-2">
+                {/* Multi-Probe Toggle */}
+                <button
+                  onClick={() => {
+                    setMultiProbeMode(!multiProbeMode);
+                    if (!multiProbeMode) setActiveProbeTarget('CH1');
+                    else setActiveProbeTarget('RED');
+                  }}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+                    multiProbeMode 
+                      ? 'bg-workstation-secondary/20 text-workstation-secondary border-workstation-secondary/50 font-bold shadow-sm'
+                      : 'bg-workstation-bg text-slate-400 border-white/5 hover:text-white'
+                  }`}
+                >
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>Multi-Probe</span>
+                </button>
+
                 {/* Active Probe Selection Mode Toggle */}
                 <div className="flex items-center bg-workstation-bg p-1 rounded-lg border border-white/5 text-xs font-mono">
                   <span className="text-slate-400 text-[10px] px-1.5 uppercase font-bold">Dock:</span>
-                  <button
-                    onClick={() => setActiveProbeTarget('RED')}
-                    className={`flex items-center gap-1.5 px-2 py-0.5 rounded transition-colors ${
-                      activeProbeTarget === 'RED'
-                        ? 'bg-rose-500 text-white font-bold shadow'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <span className="w-2 h-2 rounded-full bg-rose-300" />
-                    <span>Red (+)</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveProbeTarget('BLACK')}
-                    className={`flex items-center gap-1.5 px-2 py-0.5 rounded transition-colors ${
-                      activeProbeTarget === 'BLACK'
-                        ? 'bg-slate-700 text-slate-100 font-bold shadow'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <span className="w-2 h-2 rounded-full bg-slate-400" />
-                    <span>Black (-)</span>
-                  </button>
+                  {!multiProbeMode ? (
+                    <>
+                      <button
+                        onClick={() => setActiveProbeTarget('RED')}
+                        className={`flex items-center gap-1.5 px-2 py-0.5 rounded transition-colors ${
+                          activeProbeTarget === 'RED'
+                            ? 'bg-rose-500 text-white font-bold shadow'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-rose-300" />
+                        <span>Red (+)</span>
+                      </button>
+                      <button
+                        onClick={() => setActiveProbeTarget('BLACK')}
+                        className={`flex items-center gap-1.5 px-2 py-0.5 rounded transition-colors ${
+                          activeProbeTarget === 'BLACK'
+                            ? 'bg-slate-700 text-slate-100 font-bold shadow'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-slate-400" />
+                        <span>Black (-)</span>
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex gap-1">
+                      {['CH1', 'CH2', 'CH3', 'CH4'].map((ch) => (
+                        <button
+                          key={ch}
+                          onClick={() => setActiveProbeTarget(ch as any)}
+                          className={`px-2 py-0.5 rounded transition-colors text-[10px] font-bold ${
+                            activeProbeTarget === ch
+                              ? 'bg-workstation-secondary text-workstation-bg shadow'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {ch}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Mirrored Orientation Toggle */}
@@ -592,46 +664,77 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
 
             {/* Probe Placement Status Strip */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 bg-workstation-panel/90 px-3.5 py-2 rounded-xl border border-white/5 text-xs font-mono mb-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-sm" />
-                  <span className="text-slate-400">RED (+):</span>
-                  <span className="text-rose-300 font-bold">
-                    {redPinObj ? `#${redPinObj.pinNumber} (${redPinObj.label})` : 'DISCONNECTED'}
-                  </span>
-                  {redPinObj && (
-                    <button
-                      onClick={() => setRedProbePin(null)}
-                      className="text-slate-500 hover:text-rose-400 p-0.5 rounded ml-1"
-                      title="Disconnect Red Probe"
-                    >
-                      <Unplug className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
+              {!multiProbeMode ? (
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-sm" />
+                    <span className="text-slate-400">RED (+):</span>
+                    <span className="text-rose-300 font-bold">
+                      {redPinObj ? `#${redPinObj.pinNumber} (${redPinObj.label})` : 'DISCONNECTED'}
+                    </span>
+                    {redPinObj && (
+                      <button
+                        onClick={() => setRedProbePin(null)}
+                        className="text-slate-500 hover:text-rose-400 p-0.5 rounded ml-1"
+                        title="Disconnect Red Probe"
+                      >
+                        <Unplug className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
 
-                <span className="text-slate-700">|</span>
+                  <span className="text-slate-700">|</span>
 
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-slate-400 border border-slate-600" />
-                  <span className="text-slate-400">BLACK (-):</span>
-                  <span className="text-slate-200 font-bold">
-                    {blackPinObj ? `#${blackPinObj.pinNumber} (${blackPinObj.label})` : 'DISCONNECTED'}
-                  </span>
-                  {blackPinObj && (
-                    <button
-                      onClick={() => setBlackProbePin(null)}
-                      className="text-slate-500 hover:text-slate-200 p-0.5 rounded ml-1"
-                      title="Disconnect Black Probe"
-                    >
-                      <Unplug className="w-3 h-3" />
-                    </button>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-400 border border-slate-600" />
+                    <span className="text-slate-400">BLACK (-):</span>
+                    <span className="text-slate-200 font-bold">
+                      {blackPinObj ? `#${blackPinObj.pinNumber} (${blackPinObj.label})` : 'DISCONNECTED'}
+                    </span>
+                    {blackPinObj && (
+                      <button
+                        onClick={() => setBlackProbePin(null)}
+                        className="text-slate-500 hover:text-slate-200 p-0.5 rounded ml-1"
+                        title="Disconnect Black Probe"
+                      >
+                        <Unplug className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-4">
+                  {[0, 1, 2, 3].map(i => {
+                    const tracked = trackedPins[i];
+                    const pin = tracked ? findPin(vehicle, tracked.pinNumber, tracked.connectorId) : null;
+                    const colors = ['text-emerald-400', 'text-cyan-400', 'text-amber-400', 'text-purple-400'];
+                    return (
+                      <div key={i} className="flex items-center gap-1.5">
+                        <span className={`w-2 h-2 rounded-full bg-workstation-secondary shadow-sm ${!tracked && 'opacity-20'}`} />
+                        <span className="text-slate-500">CH{i+1}:</span>
+                        <span className={`font-bold ${colors[i]} ${!tracked && 'opacity-30'}`}>
+                          {pin ? `#${pin.pinNumber}` : '---'}
+                        </span>
+                        {tracked && (
+                          <button 
+                            onClick={() => setTrackedPins(prev => {
+                              const next = [...prev];
+                              next.splice(i, 1, undefined as any);
+                              return next.filter(Boolean); // Keep it simple for now or preserve slots
+                            })}
+                            className="text-slate-600 hover:text-white"
+                          >
+                            <Unplug className="w-2.5 h-2.5" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               <div className="text-[11px] text-workstation-accent font-medium">
-                Tap any pin to connect {activeProbeTarget === 'RED' ? 'Red (+)' : 'Black (-)'}
+                Tap any pin to connect {!multiProbeMode ? (activeProbeTarget === 'RED' ? 'Red (+)' : 'Black (-)') : activeProbeTarget}
               </div>
             </div>
 
@@ -663,8 +766,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                     </filter>
                   </defs>
                   
-                  {/* Red Probe Wire */}
-                  {redProbeCoords && (
+                  {/* Legacy Red Probe Wire */}
+                  {!multiProbeMode && redProbeCoords && (
                     <path
                       d={`M ${redProbeCoords.x + 200}, -100 C ${redProbeCoords.x + 100}, 0 ${redProbeCoords.x}, ${redProbeCoords.y - 50} ${redProbeCoords.x}, ${redProbeCoords.y}`}
                       stroke="#ef4444"
@@ -675,8 +778,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                     />
                   )}
 
-                  {/* Black Probe Wire */}
-                  {blackProbeCoords && (
+                  {/* Legacy Black Probe Wire */}
+                  {!multiProbeMode && blackProbeCoords && (
                     <path
                       d={`M ${blackProbeCoords.x - 200}, -100 C ${blackProbeCoords.x - 100}, 0 ${blackProbeCoords.x}, ${blackProbeCoords.y - 50} ${blackProbeCoords.x}, ${blackProbeCoords.y}`}
                       stroke="#475569"
@@ -686,6 +789,24 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                       className="opacity-80"
                     />
                   )}
+
+                  {/* Multi-Channel Probe Wires */}
+                  {multiProbeMode && channelCoords.map((coords, i) => {
+                    if (!coords) return null;
+                    const colors = ['#10b981', '#06b6d4', '#f59e0b', '#a855f7'];
+                    const offsets = [150, 50, -50, -150];
+                    return (
+                      <path
+                        key={i}
+                        d={`M ${coords.x + offsets[i]}, -100 C ${coords.x + offsets[i]/2}, 0 ${coords.x}, ${coords.y - 50} ${coords.x}, ${coords.y}`}
+                        stroke={colors[i]}
+                        strokeWidth="2.5"
+                        fill="none"
+                        className="opacity-70"
+                        strokeDasharray={activeProbeTarget === `CH${i+1}` ? '4 2' : 'none'}
+                      />
+                    );
+                  })}
                 </svg>
               </div>
 
@@ -728,6 +849,11 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                         {displayPins.map((pin) => {
                           const isRed = redProbePin === pin.pinNumber && (!redProbeConnectorId || redProbeConnectorId === pin.connectorId);
                           const isBlack = blackProbePin === pin.pinNumber && (!blackProbeConnectorId || blackProbeConnectorId === pin.connectorId);
+                          
+                          // Find which channel this pin is assigned to
+                          const chIndex = trackedPins.findIndex(tp => tp && tp.pinNumber === pin.pinNumber && tp.connectorId === pin.connectorId);
+                          const isChan = multiProbeMode && chIndex !== -1;
+
                           const isBatt = connectedBattPin === pin.pinNumber;
                           const isIgn = connectedIgnPin === pin.pinNumber;
                           const isGnd = connectedGroundPin === pin.pinNumber;
@@ -737,10 +863,18 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                           if (isBlank) {
                             borderClass = 'border-dashed border-slate-800/80 bg-slate-950/40 text-slate-600 hover:border-slate-700';
                           }
-                          if (isRed) borderClass = 'border-rose-500 bg-rose-950/60 text-rose-300 ring-2 ring-rose-500 font-bold';
-                          if (isBlack) borderClass = 'border-slate-400 bg-slate-800 text-slate-100 ring-2 ring-slate-400 font-bold';
-                          if (isBatt && !isRed && !isBlack) borderClass = 'border-amber-500 bg-amber-950/50 text-amber-300 font-semibold';
-                          if (isGnd && !isRed && !isBlack) borderClass = 'border-emerald-500 bg-emerald-950/50 text-emerald-300 font-semibold';
+                          if (!multiProbeMode) {
+                            if (isRed) borderClass = 'border-rose-500 bg-rose-950/60 text-rose-300 ring-2 ring-rose-500 font-bold';
+                            if (isBlack) borderClass = 'border-slate-400 bg-slate-800 text-slate-100 ring-2 ring-slate-400 font-bold';
+                          } else if (isChan) {
+                            const colors = ['border-emerald-500 bg-emerald-950/60 text-emerald-300 ring-2 ring-emerald-500', 'border-cyan-500 bg-cyan-950/60 text-cyan-300 ring-2 ring-cyan-500', 'border-amber-500 bg-amber-950/60 text-amber-300 ring-2 ring-amber-500', 'border-purple-500 bg-purple-950/60 text-purple-300 ring-2 ring-purple-500'];
+                            borderClass = colors[chIndex] + ' font-bold';
+                          }
+                          
+                          if (!isRed && !isBlack && !isChan) {
+                            if (isBatt) borderClass = 'border-amber-500 bg-amber-950/50 text-amber-300 font-semibold';
+                            if (isGnd) borderClass = 'border-emerald-500 bg-emerald-950/50 text-emerald-300 font-semibold';
+                          }
 
                           return (
                             <div key={`${conn.id}-${pin.pinNumber}`} className="relative group">
@@ -753,8 +887,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                                 <span className="text-[10px] sm:text-[11px] font-mono font-bold leading-none">
                                   {pin.pinNumber}
                                 </span>
-                                <span className="text-[7px] sm:text-[8px] font-mono text-cyan-400 truncate max-w-[36px] sm:max-w-[42px] leading-tight mt-0.5">
-                                  {isBlank ? 'NC' : pin.label.split(' ')[0]}
+                                <span className="text-[7px] sm:text-[8px] font-mono text-cyan-400 truncate max-w-[36px] sm:max-w-[42px] leading-tight mt-0.5 uppercase">
+                                  {isChan ? `CH${chIndex + 1}` : (isBlank ? 'NC' : pin.label.split(' ')[0])}
                                 </span>
                               </button>
 
@@ -882,6 +1016,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
             <div className="flex items-center gap-1 p-2 bg-workstation-bg border-b border-white/5 shrink-0">
               {[
                 { id: 'POWER_DMM', label: 'Supply & DMM' },
+                { id: 'MULTI_PROBE', label: 'Multi-Probe' },
+                { id: 'REFERENCE_COMPARE', label: 'Ref Profile' },
                 { id: 'OSCILLOSCOPE', label: 'Oscilloscope' },
                 { id: 'FAULT_INJECTION', label: 'Faults' },
                 { id: 'GUIDED_TESTS', label: 'Guided Tests' },
@@ -1131,6 +1267,193 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                     </div>
                   </div>
                 </>
+              )}
+
+              {/* TAB 1.5: MULTI-PROBE DASHBOARD */}
+              {activeTab === 'MULTI_PROBE' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-workstation-secondary" />
+                      <span className="text-xs font-mono font-bold text-slate-200">
+                        MULTI-CHANNEL DIFFERENTIAL TRACKER
+                      </span>
+                    </div>
+                    {!multiProbeMode && (
+                      <button 
+                        onClick={() => setMultiProbeMode(true)}
+                        className="text-[10px] font-mono text-workstation-accent hover:underline"
+                      >
+                        Enable Multi-Mode
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    {[0, 1, 2, 3].map(i => {
+                      const result = simResult.multimeter.multiProbeResults?.[i];
+                      const colors = ['border-emerald-500/30', 'border-cyan-500/30', 'border-amber-500/30', 'border-purple-500/30'];
+                      const textColors = ['text-emerald-400', 'text-cyan-400', 'text-amber-400', 'text-purple-400'];
+                      
+                      return (
+                        <div key={i} className={`bg-black/40 border rounded-xl p-3 flex items-center justify-between ${result ? colors[i] : 'border-white/5 opacity-50'}`}>
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center font-bold font-mono text-xs ${result ? textColors[i] : 'text-slate-600'}`}>
+                              CH{i+1}
+                            </div>
+                            <div>
+                              <span className="text-[10px] font-mono text-slate-500 block">PIN {result?.pinNumber || '---'}</span>
+                              <span className="text-xs font-bold text-white truncate max-w-[120px] block">
+                                {result?.label || 'UNASSIGNED'}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="text-right">
+                            <div className="flex items-baseline justify-end gap-1">
+                              <span className={`text-xl font-mono font-bold tabular-nums ${result ? textColors[i] : 'text-slate-700'}`}>
+                                {result && result.value !== null ? result.value.toFixed(3) : '0.000'}
+                              </span>
+                              <span className="text-[10px] font-mono text-slate-500">{result?.unit || 'V'}</span>
+                            </div>
+                            {result && (
+                              <div className="text-[9px] font-mono uppercase mt-0.5">
+                                {renderEvaluationBadge(result.evaluation)}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Voltage Delta Dashboard */}
+                  {simResult.multimeter.multiProbeResults && simResult.multimeter.multiProbeResults.length >= 2 && (
+                    <div className="bg-workstation-bg/50 border border-white/10 rounded-xl p-4 mt-6">
+                      <h4 className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">
+                        Potential Difference Summary (Relative to CH1)
+                      </h4>
+                      <div className="space-y-2">
+                        {simResult.multimeter.multiProbeResults.slice(1).map((res, i) => {
+                          const ch1 = simResult.multimeter.multiProbeResults![0];
+                          if (!ch1 || !res || ch1.value === null || res.value === null) return null;
+                          const delta = res.value - ch1.value;
+                          return (
+                            <div key={i} className="flex items-center justify-between text-xs font-mono">
+                              <span className="text-slate-500">Δ CH{i+2} – CH1:</span>
+                              <span className={`font-bold ${Math.abs(delta) > 0.5 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                {delta > 0 ? '+' : ''}{delta.toFixed(3)} V
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-3 bg-slate-900/40 rounded-lg border border-white/5 text-[10px] text-slate-500 leading-relaxed italic">
+                    Note: Multi-probe tracking performs simultaneous high-impedance sampling across the selected node matrix. Delta measurements are calculated relative to common ground reference.
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 1.6: REFERENCE DATA SIDE-BY-SIDE COMPARISON */}
+              {activeTab === 'REFERENCE_COMPARE' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                      <span className="text-xs font-mono font-bold text-slate-200 uppercase">
+                        OEM Known-Good Reference Comparison
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-500 uppercase">
+                      Profile: Baseline V1.2
+                    </span>
+                  </div>
+
+                  {!vehicle.referenceReadings || vehicle.referenceReadings.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500 text-xs italic bg-black/20 rounded-xl border border-dashed border-white/10">
+                      No reference data profile saved for this ECU platform.
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-12 px-3 text-[9px] font-mono text-slate-500 uppercase tracking-widest mb-1">
+                        <div className="col-span-3">Circuit / Pin</div>
+                        <div className="col-span-3 text-right">Reference</div>
+                        <div className="col-span-4 text-right">Live Bench</div>
+                        <div className="col-span-2 text-right">Dev.</div>
+                      </div>
+                      
+                      <div className="space-y-1.5 max-h-[400px] overflow-y-auto pr-1">
+                        {vehicle.referenceReadings.map((ref, idx) => {
+                          // Simulate live value for this reference pin
+                          const pin = findPin(vehicle, ref.pinNumber, ref.connectorId);
+                          const liveResult = calculateElectricalState(vehicle, {
+                            ...env,
+                            multimeter: {
+                              ...env.multimeter,
+                              redProbePin: ref.pinNumber,
+                              redProbeConnectorId: ref.connectorId,
+                              mode: ref.measurementType as any
+                            }
+                          });
+                          
+                          const liveVal = liveResult.multimeter.value;
+                          const diff = liveVal !== null ? liveVal - ref.referenceValue : null;
+                          const isOutOfSpec = liveVal !== null && (liveVal > ref.referenceValue + ref.tolerancePlus || liveVal < ref.referenceValue - ref.toleranceMinus);
+
+                          return (
+                            <div key={idx} className={`grid grid-cols-12 items-center px-3 py-2.5 rounded-lg border transition-all ${isOutOfSpec ? 'bg-rose-950/20 border-rose-500/30' : 'bg-white/5 border-white/5 hover:border-white/10'}`}>
+                              <div className="col-span-3 flex flex-col">
+                                <span className="text-xs font-bold text-white leading-none mb-0.5">{ref.label}</span>
+                                <span className="text-[9px] font-mono text-slate-500 uppercase">Pin #{ref.pinNumber}</span>
+                              </div>
+
+                              <div className="col-span-3 text-right flex flex-col">
+                                <span className="text-xs font-mono text-slate-300 font-semibold">
+                                  {ref.referenceValue.toFixed(ref.measurementType === 'RESISTANCE' ? 1 : 3)} {ref.unit}
+                                </span>
+                                <span className="text-[8px] font-mono text-slate-600">±{ref.tolerancePlus}</span>
+                              </div>
+
+                              <div className="col-span-4 text-right">
+                                {liveVal !== null ? (
+                                  <div className="flex flex-col">
+                                    <span className={`text-xs font-mono font-bold ${isOutOfSpec ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                      {liveVal.toFixed(ref.measurementType === 'RESISTANCE' ? 1 : 3)} {ref.unit}
+                                    </span>
+                                    <span className="text-[8px] font-mono text-slate-500 truncate">{ref.condition}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs font-mono text-slate-700 italic">Floating</span>
+                                )}
+                              </div>
+
+                              <div className="col-span-2 text-right">
+                                {diff !== null && (
+                                  <span className={`text-[10px] font-mono font-bold ${Math.abs(diff) > 0.001 ? (isOutOfSpec ? 'text-rose-500' : 'text-amber-500') : 'text-emerald-600'}`}>
+                                    {diff > 0 ? '+' : ''}{diff.toFixed(ref.measurementType === 'RESISTANCE' ? 1 : 2)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-4 p-3 bg-workstation-bg/80 rounded-xl border border-white/5 space-y-2">
+                    <div className="flex items-center gap-2 text-status-info">
+                      <Info className="w-3.5 h-3.5" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider">Calibration Note</span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-relaxed font-mono">
+                      Live bench readings are compared against verified OEM production specifications at 25°C ambient. Deviations exceeding programmed tolerances are highlighted in red for immediate engineering investigation.
+                    </p>
+                  </div>
+                </div>
               )}
 
               {/* TAB 2: 4-CHANNEL OSCILLOSCOPE */}

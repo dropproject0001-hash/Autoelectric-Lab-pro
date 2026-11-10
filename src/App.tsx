@@ -62,6 +62,8 @@ export default function App() {
     affectedCircuits: [],
   });
 
+  const [wiringHighlightedPins, setWiringHighlightedPins] = useState<{ pinA: number; pinB: number } | null>(null);
+
   const handleAddReading = (newReading: BenchReading) => {
     setBenchReadings((prev) => [newReading, ...prev]);
   };
@@ -119,6 +121,7 @@ export default function App() {
         <WiringDiagramExplorer
           vehicle={selectedVehicle}
           onSelectPinForBench={handleSelectPinForBench}
+          highlightedPins={wiringHighlightedPins}
         />
       )}
 
@@ -128,6 +131,10 @@ export default function App() {
           selectedPinNumber={selectedPinNumber}
           onSelectPin={(pinNum) => setSelectedPinNumber(pinNum)}
           onSendToBench={handleSelectPinForBench}
+          onHighlightInWiring={(pinA, pinB) => {
+            setWiringHighlightedPins({ pinA, pinB });
+            setActiveTab('wiring');
+          }}
         />
       )}
 
@@ -137,6 +144,10 @@ export default function App() {
           selectedPinNumber={selectedPinNumber}
           onSelectPin={(pinNum) => setSelectedPinNumber(pinNum)}
           onSendToBench={handleSelectPinForBench}
+          onHighlightInWiring={(pinA, pinB) => {
+            setWiringHighlightedPins({ pinA, pinB });
+            setActiveTab('wiring');
+          }}
         />
       )}
 

@@ -20,17 +20,35 @@ import {
 interface WiringDiagramExplorerProps {
   vehicle: VehicleProfile;
   onSelectPinForBench?: (pinNumber: number) => void;
+  highlightedPins?: { pinA: number; pinB: number } | null;
 }
 
 export const WiringDiagramExplorer: React.FC<WiringDiagramExplorerProps> = ({
   vehicle,
   onSelectPinForBench,
+  highlightedPins = null,
 }) => {
   const [selectedSystemId, setSelectedSystemId] = useState<string>(WIRING_SYSTEMS[0].id);
   const [selectedTraceId, setSelectedTraceId] = useState<string | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(1.0);
   const [injectedCircuitFault, setInjectedCircuitFault] = useState<string>('NONE');
+
+  React.useEffect(() => {
+    if (highlightedPins) {
+      const pinA = highlightedPins.pinA;
+      if (pinA === 1 || pinA === 4 || pinA === 5 || pinA === 10) {
+        setSelectedSystemId('sys-crdi-power');
+        setSelectedTraceId('trace-relay-to-ecu-b1');
+      } else if (pinA === 1 || pinA === 2 || pinA === 3 || pinA === 4 || pinA === 6) {
+        setSelectedSystemId('sys-sensor-5v-crdi');
+        setSelectedTraceId('trace-vc-to-splice');
+      } else {
+        setSelectedSystemId('sys-can-network');
+        setSelectedTraceId('trace-can-high');
+      }
+    }
+  }, [highlightedPins]);
 
   const activeSystem = WIRING_SYSTEMS.find((s) => s.id === selectedSystemId) || WIRING_SYSTEMS[0];
   const activeTrace = activeSystem.traces.find((t) => t.id === selectedTraceId);

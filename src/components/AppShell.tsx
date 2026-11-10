@@ -39,6 +39,12 @@ export const AppShell: React.FC<AppShellProps> = ({
 }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  React.useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const navItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -150,13 +156,19 @@ export const AppShell: React.FC<AppShellProps> = ({
             </button>
 
             <div className="hidden lg:flex flex-col">
-              <h1 className="text-xs font-mono text-slate-500 uppercase tracking-[0.2em]">
-                {navItems.find(i => i.id === activeTab)?.label || 'Engineering Station'}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xs font-mono text-slate-500 uppercase tracking-[0.2em]">
+                  {navItems.find(i => i.id === activeTab)?.label || 'Engineering Station'}
+                </h1>
+                <span className="text-[10px] font-mono text-slate-700">|</span>
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">
+                  {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                </span>
+              </div>
               <div className="flex items-center gap-2 mt-0.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
-                <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
-                  System Online · Live Telemetry
+                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                  Workstation Online · 12.8ms Latency · CPU 4%
                 </span>
               </div>
             </div>
