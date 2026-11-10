@@ -194,153 +194,164 @@ export const TestReportModal: React.FC<TestReportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-slate-900 border-2 border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-hidden">
+      <div className="bg-workstation-panel border border-white/10 rounded-2xl max-w-2xl w-full p-6 shadow-2xl flex flex-col max-h-[90vh] glass-panel font-sans">
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-500/40">
+        <div className="flex items-center justify-between pb-4 border-b border-white/5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-workstation-bg text-workstation-accent border border-white/5 shadow-inner">
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Generate Bench Test Report</h3>
-              <p className="text-xs text-slate-400 font-mono">
-                Official PDF diagnostic report & certificate of calibration
+              <h3 className="text-base font-bold text-white tracking-tight">Generate Engineering Bench Report</h3>
+              <p className="text-[11px] text-slate-500 font-mono uppercase tracking-wider">
+                Official PDF Diagnostic Certificate of Calibration
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-2 text-slate-500 hover:text-white rounded-xl hover:bg-white/5 transition-all"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="space-y-4 py-4 overflow-y-auto flex-1 text-xs">
+        <div className="space-y-5 py-5 overflow-y-auto flex-1 text-xs custom-scrollbar">
           {/* Metadata Inputs */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-slate-400 font-mono text-[11px] mb-1">
-                Technician Name / ID:
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="block text-slate-500 font-mono text-[10px] uppercase font-bold tracking-widest ml-1">
+                Technician ID / Name:
               </label>
-              <input
-                type="text"
-                value={technicianName}
-                onChange={(e) => setTechnicianName(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
-              />
+              <div className="relative">
+                <User className="w-3.5 h-3.5 text-slate-600 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={technicianName}
+                  onChange={(e) => setTechnicianName(e.target.value)}
+                  className="w-full bg-workstation-bg border border-white/10 rounded-xl pl-9 pr-4 py-2 text-slate-200 font-mono focus:outline-none focus:border-workstation-accent/50 transition-all"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-slate-400 font-mono text-[11px] mb-1">
+            <div className="space-y-1.5">
+              <label className="block text-slate-500 font-mono text-[10px] uppercase font-bold tracking-widest ml-1">
                 Repair Order (RO) #:
               </label>
-              <input
-                type="text"
-                value={jobOrderNumber}
-                onChange={(e) => setJobOrderNumber(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
-              />
+              <div className="relative">
+                <Hash className="w-3.5 h-3.5 text-slate-600 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={jobOrderNumber}
+                  onChange={(e) => setJobOrderNumber(e.target.value)}
+                  className="w-full bg-workstation-bg border border-white/10 rounded-xl pl-9 pr-4 py-2 text-slate-200 font-mono focus:outline-none focus:border-workstation-accent/50 transition-all"
+                />
+              </div>
             </div>
           </div>
 
-          <div>
-            <label className="block text-slate-400 font-mono text-[11px] mb-1">
-              Vehicle License Plate / Identifier:
+          <div className="space-y-1.5">
+            <label className="block text-slate-500 font-mono text-[10px] uppercase font-bold tracking-widest ml-1">
+              Vehicle Identifier / VIN:
             </label>
             <input
               type="text"
               value={customerPlate}
               onChange={(e) => setCustomerPlate(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+              className="w-full bg-workstation-bg border border-white/10 rounded-xl px-4 py-2 text-slate-200 font-mono focus:outline-none focus:border-workstation-accent/50 transition-all"
+              placeholder="e.g. Plate # or Chassis VIN"
             />
           </div>
 
           {/* Test Readings Summary Card */}
-          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 mb-2">
-              <span className="font-semibold text-slate-300">
-                Logged Measurements Included ({readings.length}):
-              </span>
-              <div className="flex items-center gap-2 font-mono text-[11px]">
-                <span className="text-emerald-400 font-bold">{passCount} PASS</span>
-                <span className="text-slate-600">·</span>
-                <span className="text-rose-400 font-bold">{faultCount} FAULTS</span>
+          <div className="bg-workstation-bg/50 p-4 rounded-2xl border border-white/5">
+            <div className="flex items-center justify-between pb-3 border-b border-white/5 mb-3">
+              <div className="flex items-center gap-2">
+                <Printer className="w-4 h-4 text-workstation-secondary" />
+                <span className="font-bold text-slate-300 uppercase text-[10px] tracking-widest">
+                  Telemetry Payload ({readings.length} Frames)
+                </span>
+              </div>
+              <div className="flex items-center gap-2 font-mono text-[10px]">
+                <span className="text-status-success font-extrabold">{passCount} PASS</span>
+                <span className="text-slate-700">|</span>
+                <span className="text-status-error font-extrabold">{faultCount} FAULT</span>
               </div>
             </div>
 
-            <div className="max-h-36 overflow-y-auto space-y-1.5 font-mono text-[11px]">
+            <div className="max-h-40 overflow-y-auto space-y-2 font-mono text-[10px] custom-scrollbar pr-1">
               {readings.map((r, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between p-1.5 bg-slate-900/60 rounded border border-slate-800/80"
+                  className="flex items-center justify-between p-2 bg-workstation-bg/40 rounded-lg border border-white/5"
                 >
-                  <span className="text-slate-300">
-                    Pin #{r.pinNumber} ({r.pinLabel})
-                  </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-bold">{r.measuredValue} {r.unit}</span>
+                    <span className="text-workstation-accent font-bold">#{r.pinNumber}</span>
+                    <span className="text-slate-400 truncate max-w-[140px]">{r.pinLabel}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-slate-100 font-bold tabular-nums">{r.measuredValue} {r.unit}</span>
                     <span
-                      className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
+                      className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded border ${
                         r.status === 'PASS'
-                          ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/40'
-                          : r.status === 'OPEN_CIRCUIT'
-                          ? 'bg-amber-950 text-amber-400 border border-amber-500/40'
-                          : 'bg-rose-950 text-rose-400 border border-rose-500/40'
+                          ? 'bg-status-success/10 text-status-success border-status-success/30'
+                          : 'bg-status-error/10 text-status-error border-status-error/30'
                       }`}
                     >
-                      {r.status}
+                      {r.status.substring(0, 4)}
                     </span>
                   </div>
                 </div>
               ))}
               {readings.length === 0 && (
-                <p className="text-slate-500 italic py-2 text-center font-sans">
-                  No readings logged yet. You can still generate a certificate or log readings first.
-                </p>
+                <div className="flex flex-col items-center gap-2 py-6 text-slate-600">
+                  <AlertTriangle className="w-6 h-6 opacity-20" />
+                  <p className="font-sans italic">No telemetry logged for this session.</p>
+                </div>
               )}
             </div>
           </div>
 
           {/* Technician Conclusion */}
-          <div>
-            <label className="block text-slate-400 font-mono text-[11px] mb-1">
+          <div className="space-y-1.5">
+            <label className="block text-slate-500 font-mono text-[10px] uppercase font-bold tracking-widest ml-1">
               Diagnostic Verdict & Repair Recommendations:
             </label>
             <textarea
-              rows={3}
+              rows={4}
               value={technicianConclusion}
               onChange={(e) => setTechnicianConclusion(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500"
+              className="w-full bg-workstation-bg border border-white/10 rounded-xl p-4 text-slate-200 font-mono text-xs focus:outline-none focus:border-workstation-accent/50 transition-all leading-relaxed resize-none"
             />
           </div>
         </div>
 
         {/* Modal Footer Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-800">
-          <span className="text-[11px] font-mono text-slate-500">
-            Compliant with standard automotive bench testing records
+        <div className="flex items-center justify-between pt-5 mt-2 border-t border-white/5">
+          <span className="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest">
+            ENGINEERING CERTIFICATE COMPLIANT
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+              className="px-5 py-2.5 text-xs font-bold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all"
             >
-              Cancel
+              CANCEL
             </button>
             <button
               onClick={handleGeneratePdf}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-lg transition-colors shadow-sm"
+              className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-workstation-bg bg-workstation-accent hover:bg-workstation-accent-light rounded-xl transition-all shadow-lg active:scale-95"
             >
               <Download className="w-4 h-4" />
-              <span>Download Signed PDF</span>
+              <span>DOWNLOAD SIGNED PDF</span>
             </button>
           </div>
         </div>
       </div>
     </div>
+
   );
 };

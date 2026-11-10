@@ -1,10 +1,25 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@theme {
+  --color-workstation-bg: #080D16;
+  --color-workstation-bg-lighter: #0B1220;
+  --color-workstation-panel: #111C2E;
+  --color-workstation-panel-lighter: #162235;
+  --color-workstation-accent: #FF8A00;
+  --color-workstation-accent-light: #FF9D24;
+  --color-workstation-secondary: #00C2FF;
+  
+  --color-status-success: #22C55E;
+  --color-status-warning: #FACC15;
+  --color-status-error: #EF4444;
+  --color-status-info: #38BDF8;
+  --color-status-inactive: #94A3B8;
+}
 
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    @apply bg-workstation-bg text-slate-100;
   }
   
   code, kbd, samp, pre, .font-mono {
@@ -27,21 +42,25 @@
   background-size: 40px 40px;
 }
 
+/* Workstation Glass Panel */
+.glass-panel {
+  @apply bg-workstation-panel/80 backdrop-blur-md border border-white/5 shadow-2xl;
+}
+
 /* Custom scrollbars for high-density engineering panels */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(71, 85, 105, 0.6);
-  border-radius: 3px;
+  @apply bg-slate-700/50 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.8);
+  @apply bg-workstation-accent/50;
 }

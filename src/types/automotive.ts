@@ -23,6 +23,29 @@ export type SignalType =
 
 export type VerificationLevel = 'VERIFIED' | 'CROSS_REFERENCED' | 'UNVERIFIED';
 
+/**
+ * Technical Record Provenance Source
+ * Tracks the authoritative origin of vehicle specifications, pinouts, and test thresholds.
+ * Enforces Phase 1 rule: AI inference must never automatically become OEM-verified data.
+ */
+export type TechnicalProvenanceSource =
+  | 'OEM_MANUAL'               // OEM service / workshop / repair manual
+  | 'OEM_WIRING_DIAGRAM'        // Factory electrical wiring diagram (EWD)
+  | 'MANUFACTURER_DATASHEET'    // Component / IC manufacturer specification sheet
+  | 'ENGINEERING_CALCULATION'   // Independently verified physics or electrical calculation
+  | 'MEASUREMENT'               // Empirical physical technician measurement (DMM / DSO bench)
+  | 'INFERENCE'                 // AI or computer-vision inference (strictly non-OEM verified)
+  | 'UNKNOWN';                  // Unverified or legacy source
+
+export interface ProvenanceRecord {
+  source: TechnicalProvenanceSource;
+  documentReference?: string;   // e.g. "Toyota Hilux EWD EM26F0E Sec. 2-A p. 44"
+  verifiedBy?: string;          // e.g. "RAMT Senior Automotive Electrical Engineer"
+  timestamp?: string;           // ISO date string
+  confidenceScore?: number;     // 0.0 to 1.0 (for AI inference)
+  notes?: string;
+}
+
 export type MeasurementEvaluation =
   | 'PASS'
   | 'FAIL'
@@ -57,6 +80,8 @@ export interface ConnectorPin {
   expectedBehavior: string;
   verificationLevel: VerificationLevel;
   verificationSource: string; // e.g. "Toyota Hilux EWD Section 4, p. 112"
+  provenance?: TechnicalProvenanceSource;
+  provenanceDetails?: ProvenanceRecord;
   failureSymptom: string; // e.g. "No start, 5V reference short throws P0641"
   boardTestPoint?: string; // e.g. "TP_VCC5, Pin 12 of IC402"
 }
@@ -96,6 +121,7 @@ export interface VehicleProfile {
   ecuManufacturer: 'Denso' | 'Bosch' | 'Transtron' | 'Continental' | 'Delphi' | 'Hitachi' | 'Keihin';
   ecuModel: string;
   ecuPartNumber: string;
+  ecuPartVariants?: string[];
   hardwareNumber: string;
   softwareNumber?: string;
   socketCount: number;
@@ -103,6 +129,8 @@ export interface VehicleProfile {
   description: string;
   verifiedStatus: VerificationLevel;
   pinoutSource: string;
+  provenance?: TechnicalProvenanceSource;
+  provenanceDetails?: ProvenanceRecord;
   completenessReports: ConnectorCompleteness[];
 }
 

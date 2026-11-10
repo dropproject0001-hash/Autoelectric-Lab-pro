@@ -186,87 +186,91 @@ export const ComponentReadingsLab: React.FC<ComponentReadingsLabProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-100 p-3 sm:p-6 overflow-y-auto tech-grid">
+    <div className="flex flex-col h-full bg-workstation-bg text-slate-100 p-3 sm:p-6 overflow-y-auto tech-grid font-sans">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/5">
         <div>
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
+            <SlidersHorizontal className="w-4 h-4 text-workstation-accent shrink-0" />
+            <span className="text-xs font-mono text-workstation-accent uppercase tracking-wider">
               Component Readings & Tolerances · {vehicle.chassisCode}
             </span>
           </div>
           <h2 className="text-base sm:text-lg font-bold text-white mt-0.5">
-            Bench Measurement Log: {vehicle.make} {vehicle.model} ({vehicle.ecuPartNumber})
+            Bench Measurement Log: {vehicle.make} {vehicle.model}
           </h2>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Summary Scoreboard */}
-          <div className="flex items-center gap-2 text-xs font-mono bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
+          <div className="flex items-center gap-2 text-xs font-mono bg-workstation-panel/80 px-3 py-1.5 rounded-lg border border-white/5">
             <span className="text-slate-400">Total: {readings.length}</span>
             <span className="text-slate-700">|</span>
-            <span className="text-emerald-400 font-bold">PASS: {passCount}</span>
+            <span className="text-status-success font-bold">PASS: {passCount}</span>
             <span className="text-slate-700">|</span>
-            <span className="text-rose-400 font-bold">FAULTS: {faultCount}</span>
+            <span className="text-status-error font-bold">FAULTS: {faultCount}</span>
           </div>
 
           <button
             onClick={onExportPdf}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-md transition-colors shadow-sm whitespace-nowrap"
+            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-workstation-bg bg-workstation-accent hover:bg-workstation-accent-light rounded-xl transition-all shadow-lg active:scale-95 whitespace-nowrap"
           >
-            <Download className="w-3.5 h-3.5 shrink-0" />
+            <Download className="w-4 h-4 shrink-0" />
             <span>Export PDF Report</span>
           </button>
         </div>
       </div>
 
       {/* Recommended OEM Bench Test Points Grid */}
-      <div className="mt-5">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">
-            Standard OEM Bench Test Points (Click to add or probe)
-          </span>
-          <span className="text-[11px] font-mono text-slate-500">
-            Verified tolerance windows from manufacturer documentation
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 text-workstation-secondary" />
+            <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">
+              Standard OEM Bench Test Points
+            </span>
+          </div>
+          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+            Manufacturer Verified Tolerances
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {defaultTestPoints.map((tp, idx) => (
             <div
               key={idx}
-              className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-colors"
+              className="bg-workstation-panel/40 p-4 rounded-2xl border border-white/5 flex flex-col justify-between hover:border-workstation-accent/30 transition-all hover:shadow-xl group cursor-default"
             >
               <div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-mono text-cyan-400 font-bold">
+                  <span className="font-mono text-workstation-accent font-bold">
                     Pin #{tp.pinNumber}
                   </span>
-                  <span className="font-mono text-[10px] text-slate-400 px-1.5 py-0.5 bg-slate-950 rounded border border-slate-800">
+                  <span className="font-mono text-[10px] text-slate-500 px-2 py-0.5 bg-workstation-bg rounded border border-white/5 uppercase">
                     {tp.mode.replace('_', ' ')}
                   </span>
                 </div>
-                <h4 className="font-semibold text-sm text-white mt-1">{tp.label}</h4>
-                <div className="flex items-baseline gap-1 mt-1 text-xs font-mono text-emerald-400 font-bold">
-                  <span>Expected: {tp.expectedMin} – {tp.expectedMax} {tp.unit}</span>
+                <h4 className="font-bold text-sm text-slate-100 mt-2">{tp.label}</h4>
+                <div className="flex items-baseline gap-1.5 mt-2 p-2 bg-workstation-bg rounded-lg border border-white/5">
+                   <span className="text-[10px] font-mono text-slate-500 uppercase">Expect:</span>
+                   <span className="text-xs font-mono text-status-success font-bold">{tp.expectedMin} – {tp.expectedMax} {tp.unit}</span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1 leading-snug">{tp.notes}</p>
+                <p className="text-[11px] text-slate-500 mt-2 leading-relaxed italic">{tp.notes}</p>
               </div>
 
-              <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-slate-800/80">
+              <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/5">
                 <button
                   onClick={() => onSelectPinForBench(tp.pinNumber)}
-                  className="flex-1 py-1 text-center text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded transition-colors"
+                  className="flex-1 py-1.5 text-center text-[11px] font-bold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-all"
                 >
-                  Probe on Bench
+                  Probe Pin
                 </button>
                 <button
                   onClick={() => handleQuickAddDefault(tp)}
-                  className="px-2.5 py-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 rounded transition-colors"
-                  title="Add reading to log"
+                  className="px-3 py-1.5 text-xs font-bold text-workstation-secondary hover:bg-workstation-secondary/10 border border-workstation-secondary/30 rounded-lg transition-all"
+                  title="Add nominal reading to log"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -275,29 +279,29 @@ export const ComponentReadingsLab: React.FC<ComponentReadingsLabProps> = ({
       </div>
 
       {/* Main Measurements Table */}
-      <div className="bg-slate-900/60 rounded-xl border border-slate-800 overflow-hidden flex-1 flex flex-col">
+      <div className="bg-workstation-panel/60 rounded-2xl border border-white/5 overflow-hidden flex-1 flex flex-col shadow-2xl">
         {/* Table Filter Ribbon */}
-        <div className="p-3 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
-          <div className="relative min-w-[220px]">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+        <div className="p-4 bg-workstation-panel border-b border-white/5 flex flex-wrap items-center justify-between gap-4">
+          <div className="relative min-w-[280px]">
+            <Search className="w-4 h-4 text-slate-600 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search logged readings..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-950 border border-slate-800 rounded-md text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"
+              className="w-full pl-10 pr-4 py-2 text-xs bg-workstation-bg border border-white/10 rounded-xl text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-workstation-accent/50 transition-all font-mono"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs font-mono overflow-x-auto">
+          <div className="flex items-center gap-1.5 text-[10px] font-mono overflow-x-auto p-1 bg-workstation-bg rounded-xl border border-white/5">
             {['ALL', 'PASS', 'FAIL', 'OPEN_CIRCUIT', 'SHORT_CIRCUIT', 'NOT_APPLICABLE'].map((st) => (
               <button
                 key={st}
                 onClick={() => setFilterStatus(st)}
-                className={`px-3 py-1 rounded transition-colors whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-lg transition-all uppercase font-bold whitespace-nowrap ${
                   filterStatus === st
-                    ? 'bg-slate-800 text-cyan-400 border border-slate-700 font-bold'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-workstation-accent text-workstation-bg shadow-lg'
+                    : 'text-slate-500 hover:text-slate-200'
                 }`}
               >
                 {st.replace('_', ' ')}
@@ -307,47 +311,53 @@ export const ComponentReadingsLab: React.FC<ComponentReadingsLabProps> = ({
         </div>
 
         {/* Table Content */}
-        <div className="overflow-x-auto flex-1">
-          <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+        <div className="overflow-x-auto flex-1 custom-scrollbar">
+          <table className="w-full text-left text-xs font-mono border-separate border-spacing-0">
+            <thead className="bg-workstation-bg/50 text-slate-500 uppercase text-[9px] tracking-widest sticky top-0 z-10 backdrop-blur-md border-b border-white/5">
               <tr>
-                <th className="px-4 py-3">Time</th>
-                <th className="px-4 py-3">Pin #</th>
-                <th className="px-4 py-3">Label & Function</th>
-                <th className="px-4 py-3">Test Mode</th>
-                <th className="px-4 py-3 text-right">Measured</th>
-                <th className="px-4 py-3 text-right">Expected OEM Spec</th>
-                <th className="px-4 py-3 text-center">Evaluation</th>
-                <th className="px-4 py-3">Diagnostic Notes</th>
-                <th className="px-4 py-3 text-center">Action</th>
+                <th className="px-6 py-4 font-bold">Time</th>
+                <th className="px-6 py-4 font-bold text-center">Pin</th>
+                <th className="px-6 py-4 font-bold">Label & Functional Role</th>
+                <th className="px-6 py-4 font-bold text-center">Mode</th>
+                <th className="px-6 py-4 text-right font-bold">Measured</th>
+                <th className="px-6 py-4 text-right font-bold">OEM Range</th>
+                <th className="px-6 py-4 text-center font-bold">Status</th>
+                <th className="px-6 py-4 font-bold">Engineer Notes</th>
+                <th className="px-6 py-4 text-center font-bold">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-white/5">
               {filteredReadings.map((reading) => (
-                <tr key={reading.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{reading.timestamp}</td>
-                  <td className="px-4 py-3 font-bold text-cyan-400">#{reading.pinNumber}</td>
-                  <td className="px-4 py-3 font-sans font-semibold text-white">{reading.pinLabel}</td>
-                  <td className="px-4 py-3 text-slate-400">{reading.measurementType.replace('_', ' ')}</td>
-                  <td className="px-4 py-3 text-right font-bold text-slate-100 tabular-nums">
-                    {reading.measuredValue} {reading.unit}
+                <tr key={reading.id} className="hover:bg-white/5 transition-colors group">
+                  <td className="px-6 py-4 text-slate-500 whitespace-nowrap">{reading.timestamp}</td>
+                  <td className="px-6 py-4 text-center font-extrabold text-workstation-accent">#{reading.pinNumber}</td>
+                  <td className="px-6 py-4 font-sans">
+                    <div className="font-bold text-slate-200">{reading.pinLabel}</div>
                   </td>
-                  <td className="px-4 py-3 text-right text-slate-400 tabular-nums">
+                  <td className="px-6 py-4 text-center">
+                    <span className="px-2 py-1 bg-white/5 rounded-md border border-white/5 text-[9px] text-slate-500 uppercase font-bold">
+                      {reading.measurementType.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right font-bold text-slate-100 tabular-nums text-sm">
+                    {reading.measuredValue} <span className="text-[10px] text-slate-500 font-normal">{reading.unit}</span>
+                  </td>
+                  <td className="px-6 py-4 text-right text-slate-500 tabular-nums">
                     {reading.expectedMin} – {reading.expectedMax} {reading.unit}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-6 py-4 text-center">
                     {renderStatusBadge(reading.status)}
                   </td>
-                  <td className="px-4 py-3 text-slate-400 truncate max-w-[260px]" title={reading.notes}>
+                  <td className="px-6 py-4 text-slate-400 italic text-[11px] max-w-[200px] truncate" title={reading.notes}>
                     {reading.notes}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-6 py-4 text-center">
                     <button
                       onClick={() => onDeleteReading(reading.id)}
-                      className="p-1 text-slate-500 hover:text-rose-400 rounded transition-colors"
-                      title="Delete measurement row"
+                      className="p-2 text-slate-600 hover:text-status-error hover:bg-status-error/10 rounded-lg transition-all"
+                      title="Delete measurement record"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
@@ -355,8 +365,11 @@ export const ComponentReadingsLab: React.FC<ComponentReadingsLabProps> = ({
 
               {filteredReadings.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-slate-500 font-sans">
-                    No readings logged matching filter. Perform a measurement on the Virtual Bench or click a test point above.
+                  <td colSpan={9} className="px-6 py-12 text-center text-slate-600 font-sans">
+                    <div className="flex flex-col items-center gap-3">
+                      <FileText className="w-10 h-10 opacity-20" />
+                      <p>No telemetry records found. Initiate measurements on the workbench to populate the log.</p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -365,5 +378,6 @@ export const ComponentReadingsLab: React.FC<ComponentReadingsLabProps> = ({
         </div>
       </div>
     </div>
+
   );
 };

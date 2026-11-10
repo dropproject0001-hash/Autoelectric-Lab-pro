@@ -115,6 +115,48 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
   });
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const connectorRef = useRef<HTMLDivElement | null>(null);
+  const [redProbeCoords, setRedProbeCoords] = useState<{ x: number; y: number } | null>(null);
+  const [blackProbeCoords, setBlackProbeCoords] = useState<{ x: number; y: number } | null>(null);
+
+  // Dynamic probe wire coordinate calculation
+  useEffect(() => {
+    const updateProbeCoords = () => {
+      if (!connectorRef.current) return;
+      const rect = connectorRef.current.getBoundingClientRect();
+
+      if (redProbePin !== null) {
+        const pinEl = connectorRef.current.querySelector(`[data-pin="${redProbePin}"]`);
+        if (pinEl) {
+          const pinRect = pinEl.getBoundingClientRect();
+          setRedProbeCoords({
+            x: pinRect.left - rect.left + pinRect.width / 2,
+            y: pinRect.top - rect.top + pinRect.height / 2,
+          });
+        }
+      } else {
+        setRedProbeCoords(null);
+      }
+
+      if (blackProbePin !== null) {
+        const pinEl = connectorRef.current.querySelector(`[data-pin="${blackProbePin}"]`);
+        if (pinEl) {
+          const pinRect = pinEl.getBoundingClientRect();
+          setBlackProbeCoords({
+            x: pinRect.left - rect.left + pinRect.width / 2,
+            y: pinRect.top - rect.top + pinRect.height / 2,
+          });
+        }
+      } else {
+        setBlackProbeCoords(null);
+      }
+    };
+
+    updateProbeCoords();
+    // Re-calculate on window resize or when probes/view orientation change
+    window.addEventListener('resize', updateProbeCoords);
+    return () => window.removeEventListener('resize', updateProbeCoords);
+  }, [redProbePin, blackProbePin, viewOrientation, layoutMode]);
 
   // Sync initial pin selection if prop changes
   useEffect(() => {
@@ -363,9 +405,9 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-slate-950 text-slate-100 select-none overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-workstation-bg text-slate-100 select-none overflow-hidden">
       {/* Top Bench Telemetry Bar & Responsive Layout Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6 py-2 bg-slate-900 border-b border-slate-800 text-xs font-mono shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6 py-2 bg-workstation-panel border-b border-white/5 text-xs font-mono shrink-0">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5">
             <span
@@ -385,7 +427,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
           <span className="text-slate-700">|</span>
 
           <span className="text-slate-400 text-[11px] sm:text-xs">
-            DRAIN: <strong className="text-cyan-400">{simResult.powerSupply.quiescentDrawMa} mA</strong>
+            DRAIN: <strong className="text-workstation-accent">{simResult.powerSupply.quiescentDrawMa} mA</strong>
           </span>
 
           <span className="text-slate-700">|</span>
@@ -397,7 +439,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
           {/* Toggle Engine Simulation Sliders Drawer */}
           <button
             onClick={() => setShowEngineParams(!showEngineParams)}
-            className="flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 ml-auto sm:ml-2"
+            className="flex items-center gap-1 text-[11px] text-workstation-accent hover:text-workstation-accent-light ml-auto sm:ml-2"
           >
             <Gauge className="w-3 h-3" />
             <span className="hidden xs:inline">Engine: {simulatedRPM} RPM</span>
@@ -405,12 +447,12 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
         </div>
 
         {/* View Layout Switcher (Mobile & Desktop) */}
-        <div className="flex items-center self-end sm:self-auto bg-slate-950 p-0.5 rounded-lg border border-slate-800">
+        <div className="flex items-center self-end sm:self-auto bg-workstation-bg p-0.5 rounded-lg border border-white/5">
           <button
             onClick={() => setLayoutMode('SPLIT')}
             className={`px-2 py-1 text-[11px] font-mono rounded transition-colors whitespace-nowrap ${
               layoutMode === 'SPLIT'
-                ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 font-bold shadow-sm'
+                ? 'bg-workstation-accent/20 text-workstation-accent border border-workstation-accent/50 font-bold shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -421,7 +463,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
             onClick={() => setLayoutMode('CONNECTOR')}
             className={`px-2 py-1 text-[11px] font-mono rounded transition-colors whitespace-nowrap ${
               layoutMode === 'CONNECTOR'
-                ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 font-bold shadow-sm'
+                ? 'bg-workstation-accent/20 text-workstation-accent border border-workstation-accent/50 font-bold shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -431,7 +473,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
             onClick={() => setLayoutMode('INSTRUMENTS')}
             className={`px-2 py-1 text-[11px] font-mono rounded transition-colors whitespace-nowrap ${
               layoutMode === 'INSTRUMENTS'
-                ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 font-bold shadow-sm'
+                ? 'bg-workstation-accent/20 text-workstation-accent border border-workstation-accent/50 font-bold shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -491,11 +533,11 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden relative">
         {/* Left Side: Interactive ECU Sockets & Probe Docking Bay */}
         {(layoutMode === 'SPLIT' || layoutMode === 'CONNECTOR') && (
-          <div className="flex-1 w-full min-w-0 flex flex-col p-3 sm:p-5 lg:p-6 overflow-y-auto border-b lg:border-b-0 lg:border-r border-slate-800 tech-grid">
+          <div className="flex-1 w-full min-w-0 flex flex-col p-3 sm:p-5 lg:p-6 overflow-y-auto border-b lg:border-b-0 lg:border-r border-white/5 tech-grid">
             {/* Workbench Top Controls & Active Probe Selector */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider">
+                <span className="text-[10px] font-mono text-workstation-accent uppercase tracking-wider">
                   Test Bench · {vehicle.chassisCode}
                 </span>
                 <h3 className="text-sm sm:text-base font-bold text-white mt-0.5 truncate">
@@ -506,7 +548,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
               {/* Probe Docking Selector & Orientation Controls */}
               <div className="flex flex-wrap items-center gap-2">
                 {/* Active Probe Selection Mode Toggle */}
-                <div className="flex items-center bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs font-mono">
+                <div className="flex items-center bg-workstation-bg p-1 rounded-lg border border-white/5 text-xs font-mono">
                   <span className="text-slate-400 text-[10px] px-1.5 uppercase font-bold">Dock:</span>
                   <button
                     onClick={() => setActiveProbeTarget('RED')}
@@ -537,10 +579,10 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                   onClick={() =>
                     setViewOrientation((prev) => (prev === 'RECEPTACLE' ? 'HARNESS_PLUG' : 'RECEPTACLE'))
                   }
-                  className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
+                  className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-lg bg-workstation-bg hover:bg-white/5 border border-white/5 text-slate-300 transition-colors"
                   title="Toggle between ECU male pin view and mirrored harness female socket view"
                 >
-                  <RotateCw className="w-3.5 h-3.5 text-cyan-400" />
+                  <RotateCw className="w-3.5 h-3.5 text-workstation-accent" />
                   <span className="text-[11px]">
                     {viewOrientation === 'RECEPTACLE' ? 'ECU (Front)' : 'Harness (Back)'}
                   </span>
@@ -549,7 +591,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
             </div>
 
             {/* Probe Placement Status Strip */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 bg-slate-900/90 px-3.5 py-2 rounded-xl border border-slate-800 text-xs font-mono mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 bg-workstation-panel/90 px-3.5 py-2 rounded-xl border border-white/5 text-xs font-mono mb-4">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-sm" />
@@ -588,16 +630,68 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                 </div>
               </div>
 
-              <div className="text-[11px] text-cyan-400 font-medium">
+              <div className="text-[11px] text-workstation-accent font-medium">
                 Tap any pin to connect {activeProbeTarget === 'RED' ? 'Red (+)' : 'Black (-)'}
               </div>
             </div>
 
-            {/* Central ECU Metal Receptacle Visualization */}
-            <div className="bg-slate-900/90 border-2 border-slate-800 rounded-2xl p-3 sm:p-5 shadow-2xl relative mb-6">
+            <div 
+              ref={connectorRef}
+              className="bg-workstation-panel/90 border-2 border-white/5 rounded-2xl p-3 sm:p-5 shadow-2xl relative mb-6"
+            >
+              {/* SVG Overlay for Probe Wires */}
+              <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden rounded-2xl">
+                <svg className="w-full h-full">
+                  <defs>
+                    <filter id="wire-glow-red" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feFlood floodColor="#ef4444" floodOpacity="0.5" result="glowColor" />
+                      <feComposite in="glowColor" in2="blur" operator="in" result="glow" />
+                      <feMerge>
+                        <feMergeNode in="glow" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                    <filter id="wire-glow-black" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feFlood floodColor="#94a3b8" floodOpacity="0.5" result="glowColor" />
+                      <feComposite in="glowColor" in2="blur" operator="in" result="glow" />
+                      <feMerge>
+                        <feMergeNode in="glow" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  
+                  {/* Red Probe Wire */}
+                  {redProbeCoords && (
+                    <path
+                      d={`M ${redProbeCoords.x + 200}, -100 C ${redProbeCoords.x + 100}, 0 ${redProbeCoords.x}, ${redProbeCoords.y - 50} ${redProbeCoords.x}, ${redProbeCoords.y}`}
+                      stroke="#ef4444"
+                      strokeWidth="3"
+                      fill="none"
+                      filter="url(#wire-glow-red)"
+                      className="opacity-80"
+                    />
+                  )}
+
+                  {/* Black Probe Wire */}
+                  {blackProbeCoords && (
+                    <path
+                      d={`M ${blackProbeCoords.x - 200}, -100 C ${blackProbeCoords.x - 100}, 0 ${blackProbeCoords.x}, ${blackProbeCoords.y - 50} ${blackProbeCoords.x}, ${blackProbeCoords.y}`}
+                      stroke="#475569"
+                      strokeWidth="3"
+                      fill="none"
+                      filter="url(#wire-glow-black)"
+                      className="opacity-80"
+                    />
+                  )}
+                </svg>
+              </div>
+
               <div className="flex flex-wrap items-center justify-between mb-3 pb-2 border-b border-slate-800 gap-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-sm" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-workstation-accent shadow-sm" />
                   <span className="font-mono text-xs font-bold text-slate-200 uppercase truncate">
                     {vehicle.ecuManufacturer} {vehicle.ecuModel} ({viewOrientation})
                   </span>
@@ -652,6 +746,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                             <div key={`${conn.id}-${pin.pinNumber}`} className="relative group">
                               <button
                                 onClick={() => handlePinClick(pin)}
+                                data-pin={pin.pinNumber}
                                 className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg border flex flex-col items-center justify-center transition-all ${borderClass}`}
                                 title={`Pin #${pin.pinNumber} (${pin.label}): ${pin.functionDesc}`}
                               >
@@ -782,9 +877,9 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
 
         {/* Right Side: Virtual Diagnostic Instrument Rack */}
         {(layoutMode === 'SPLIT' || layoutMode === 'INSTRUMENTS') && (
-          <div className="w-full lg:w-[460px] xl:w-[480px] shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-slate-800 bg-slate-900/90 overflow-y-auto">
+          <div className="w-full lg:w-[460px] xl:w-[480px] shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-white/5 bg-workstation-panel/90 overflow-y-auto">
             {/* Instrument Rack Mode Selector */}
-            <div className="flex items-center gap-1 p-2 bg-slate-950 border-b border-slate-800 shrink-0">
+            <div className="flex items-center gap-1 p-2 bg-workstation-bg border-b border-white/5 shrink-0">
               {[
                 { id: 'POWER_DMM', label: 'Supply & DMM' },
                 { id: 'OSCILLOSCOPE', label: 'Oscilloscope' },
@@ -796,7 +891,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'bg-slate-800 text-cyan-400 border border-slate-700 shadow-sm'
+                      ? 'bg-white/5 text-workstation-accent border border-workstation-accent/30 shadow-sm'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -810,10 +905,10 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
               {activeTab === 'POWER_DMM' && (
                 <>
                   {/* DC Power Supply Rack */}
-                  <div className="bg-slate-950 border-2 border-slate-800 rounded-xl p-3 sm:p-4 shadow-xl relative">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-3">
+                  <div className="bg-workstation-bg border-2 border-white/5 rounded-xl p-3 sm:p-4 shadow-xl relative">
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
                       <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-amber-400" />
+                        <Zap className="w-4 h-4 text-workstation-accent" />
                         <span className="text-xs font-mono font-bold text-slate-200">
                           BENCH POWER SUPPLY (0-30V)
                         </span>
@@ -822,8 +917,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                         onClick={() => setPsOutputEnabled(!psOutputEnabled)}
                         className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold font-mono rounded transition-colors ${
                           psOutputEnabled
-                            ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                            : 'bg-slate-800 text-slate-400 border border-slate-700'
+                            ? 'bg-workstation-accent text-workstation-bg shadow-md shadow-workstation-accent/20'
+                            : 'bg-white/5 text-slate-400 border border-white/5'
                         }`}
                       >
                         <Power className="w-3.5 h-3.5" />
@@ -833,7 +928,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
 
                     {/* Dual Digital LED Readouts */}
                     <div className="grid grid-cols-2 gap-3 mb-3">
-                      <div className="bg-black/90 p-2.5 rounded-lg border border-slate-800 text-center">
+                      <div className="bg-black/90 p-2.5 rounded-lg border border-white/5 text-center">
                         <span className="text-[10px] font-mono text-slate-500 block uppercase">
                           Actual Voltage
                         </span>
@@ -843,13 +938,13 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                         <span className="text-xs font-mono text-slate-500 ml-1">V</span>
                       </div>
 
-                      <div className="bg-black/90 p-2.5 rounded-lg border border-slate-800 text-center">
+                      <div className="bg-black/90 p-2.5 rounded-lg border border-white/5 text-center">
                         <span className="text-[10px] font-mono text-slate-500 block uppercase">
                           Current Draw
                         </span>
                         <span
                           className={`text-2xl sm:text-3xl font-mono font-bold tabular-nums ${
-                            simResult.powerSupply.isOvercurrent ? 'text-rose-500' : 'text-cyan-400'
+                            simResult.powerSupply.isOvercurrent ? 'text-status-error' : 'text-workstation-accent'
                           }`}
                         >
                           {simResult.powerSupply.actualCurrent.toFixed(3)}
@@ -868,7 +963,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                               <button
                                 key={v}
                                 onClick={() => setPsVoltageSet(v)}
-                                className="px-1.5 py-0.5 bg-slate-900 hover:bg-slate-800 text-[10px] rounded border border-slate-700"
+                                className="px-1.5 py-0.5 bg-workstation-bg hover:bg-white/5 text-[10px] rounded border border-white/5"
                               >
                                 {v}V
                               </button>
@@ -882,7 +977,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                           step="0.1"
                           value={psVoltageSet}
                           onChange={(e) => setPsVoltageSet(Number(e.target.value))}
-                          className="w-full accent-amber-400 h-1.5 bg-slate-800 rounded"
+                          className="w-full accent-workstation-accent h-1.5 bg-white/5 rounded"
                         />
                       </div>
 
@@ -908,7 +1003,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                           step="0.1"
                           value={psCurrentLimitSet}
                           onChange={(e) => setPsCurrentLimitSet(Number(e.target.value))}
-                          className="w-full accent-cyan-400 h-1.5 bg-slate-800 rounded"
+                          className="w-full accent-workstation-accent h-1.5 bg-white/5 rounded"
                         />
                       </div>
                     </div>
@@ -922,10 +1017,10 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                   </div>
 
                   {/* Digital Multimeter Rack */}
-                  <div className="bg-slate-950 border-2 border-slate-800 rounded-xl p-3 sm:p-4 shadow-xl">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-3">
+                  <div className="bg-workstation-bg border-2 border-white/5 rounded-xl p-3 sm:p-4 shadow-xl">
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
                       <div className="flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-cyan-400" />
+                        <Activity className="w-4 h-4 text-workstation-accent" />
                         <span className="text-xs font-mono font-bold text-slate-200">
                           TRUE-RMS DIGITAL MULTIMETER
                         </span>
@@ -937,9 +1032,9 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                           className="p-1 text-slate-400 hover:text-white rounded"
                           title="Toggle Continuity Beeper Audio"
                         >
-                          {soundEnabled ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-slate-600" />}
+                          {soundEnabled ? <Volume2 className="w-4 h-4 text-workstation-accent" /> : <VolumeX className="w-4 h-4 text-slate-600" />}
                         </button>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-workstation-bg border border-white/10 text-slate-300">
                           AUTO
                         </span>
                       </div>
@@ -980,8 +1075,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                           onClick={() => setMmMode(m.id as any)}
                           className={`py-1.5 rounded text-center transition-colors text-[11px] ${
                             mmMode === m.id
-                              ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500 font-bold'
-                              : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                              ? 'bg-workstation-accent/20 text-workstation-accent border border-workstation-accent font-bold'
+                              : 'bg-workstation-bg text-slate-400 hover:text-white border border-white/5'
                           }`}
                         >
                           {m.label}
@@ -990,7 +1085,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                     </div>
 
                     {/* Diagnostic Explanation */}
-                    <div className="p-2.5 bg-slate-900 rounded-lg border border-slate-800 text-xs space-y-1 mb-3">
+                    <div className="p-2.5 bg-workstation-bg rounded-lg border border-white/5 text-xs space-y-1 mb-3">
                       <span className="text-slate-400 font-semibold block text-[10px] uppercase font-mono">
                         Diagnostic Evaluation:
                       </span>
@@ -1003,7 +1098,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                     <div className="flex gap-2">
                       <button
                         onClick={handleSaveCurrentReading}
-                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-lg transition-colors shadow-sm"
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-workstation-bg bg-workstation-accent hover:bg-workstation-accent-light rounded-lg transition-colors shadow-sm"
                       >
                         <Save className="w-3.5 h-3.5" />
                         <span>Log Reading</span>
@@ -1028,9 +1123,9 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                           };
                           onAskAiAboutReading(reading);
                         }}
-                        className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 transition-colors"
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-200 bg-white/5 hover:bg-white/10 rounded-lg border border-white/5 transition-all"
                       >
-                        <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />
+                        <HelpCircle className="w-3.5 h-3.5 text-workstation-accent" />
                         <span>Consult AI</span>
                       </button>
                     </div>
@@ -1041,15 +1136,15 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
               {/* TAB 2: 4-CHANNEL OSCILLOSCOPE */}
               {activeTab === 'OSCILLOSCOPE' && (
                 <div className="space-y-4">
-                  <div className="bg-black border-2 border-slate-800 rounded-xl p-3 shadow-2xl relative">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2">
+                  <div className="bg-black border-2 border-white/5 rounded-xl p-3 shadow-2xl relative">
+                    <div className="flex items-center justify-between pb-2 border-b border-white/5 mb-2">
                       <span className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5">
                         <Activity className="w-3.5 h-3.5" /> DSO-4000 STORAGE OSCILLOSCOPE
                       </span>
                       <button
                         onClick={() => setScopeRunning(!scopeRunning)}
                         className={`flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-mono font-bold rounded ${
-                          scopeRunning ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white'
+                          scopeRunning ? 'bg-workstation-secondary text-workstation-bg' : 'bg-status-error text-white'
                         }`}
                       >
                         {scopeRunning ? <Square className="w-3 h-3" /> : <Play className="w-3 h-3" />}
@@ -1058,7 +1153,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                     </div>
 
                     {/* Oscilloscope Canvas */}
-                    <div className="w-full overflow-hidden rounded-lg bg-black border border-slate-800">
+                    <div className="w-full overflow-hidden rounded-lg bg-black border border-white/5">
                       <canvas
                         ref={canvasRef}
                         width={440}
@@ -1068,7 +1163,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                     </div>
 
                     {/* Channel Metrics Strip */}
-                    <div className="grid grid-cols-3 gap-2 mt-3 text-[11px] font-mono bg-slate-950 p-2.5 rounded border border-slate-800">
+                    <div className="grid grid-cols-3 gap-2 mt-3 text-[11px] font-mono bg-workstation-bg p-2.5 rounded border border-white/5">
                       <div>
                         <span className="text-slate-500 block text-[10px]">CH1 Vpp</span>
                         <span className="text-emerald-400 font-bold">{simResult.signalMetrics.ch1Vpp} V</span>
@@ -1085,7 +1180,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                   </div>
 
                   {/* Oscilloscope Timebase and Volts/Div controls */}
-                  <div className="bg-slate-950 p-3 sm:p-4 rounded-xl border border-slate-800 space-y-3 text-xs font-mono">
+                  <div className="bg-workstation-bg p-3 sm:p-4 rounded-xl border border-white/5 space-y-3 text-xs font-mono">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-slate-400">CH1 Scale:</span>
                       <div className="flex flex-wrap gap-1">
@@ -1095,8 +1190,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                             onClick={() => setScopeVoltsPerDiv(v)}
                             className={`px-2 py-1 rounded text-[11px] ${
                               scopeVoltsPerDiv === v
-                                ? 'bg-emerald-500 text-slate-950 font-bold'
-                                : 'bg-slate-900 text-slate-400 hover:text-white'
+                                ? 'bg-workstation-secondary/20 text-workstation-secondary font-bold border border-workstation-secondary/30'
+                                : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
                             }`}
                           >
                             {v}V
@@ -1114,8 +1209,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                             onClick={() => setScopeTimebaseMs(t)}
                             className={`px-2 py-1 rounded text-[11px] ${
                               scopeTimebaseMs === t
-                                ? 'bg-cyan-400 text-slate-950 font-bold'
-                                : 'bg-slate-900 text-slate-400 hover:text-white'
+                                ? 'bg-workstation-accent/20 text-workstation-accent font-bold border border-workstation-accent/30'
+                                : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
                             }`}
                           >
                             {t}ms
@@ -1130,8 +1225,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
               {/* TAB 3: ELECTRICAL FAULT INJECTION */}
               {activeTab === 'FAULT_INJECTION' && (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
-                    <AlertTriangle className="w-4 h-4 text-amber-400" />
+                  <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+                    <AlertTriangle className="w-4 h-4 text-workstation-accent" />
                     <span className="text-xs font-mono font-bold text-slate-200">
                       BENCH ELECTRICAL FAULT INJECTION
                     </span>
@@ -1186,8 +1281,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                         }
                         className={`w-full p-2.5 sm:p-3 rounded-lg border text-left transition-all ${
                           activeFault.id === fault.id
-                            ? 'bg-rose-950/40 border-rose-500 text-white'
-                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                            ? 'bg-status-error/10 border-status-error text-white'
+                            : 'bg-workstation-bg border-white/5 text-slate-400 hover:text-slate-200'
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -1195,7 +1290,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                             {fault.name}
                           </span>
                           {activeFault.id === fault.id && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-rose-500 text-slate-950 font-bold">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-status-error text-white font-bold">
                               ACTIVE
                             </span>
                           )}
@@ -1210,8 +1305,8 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
               {/* TAB 4: GUIDED AUTOMOTIVE BENCH PROCEDURES */}
               {activeTab === 'GUIDED_TESTS' && (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                  <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+                    <CheckCircle2 className="w-4 h-4 text-workstation-accent" />
                     <span className="text-xs font-mono font-bold text-slate-200">
                       STEP-BY-STEP OEM BENCH PROCEDURES
                     </span>
@@ -1246,16 +1341,16 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
                     ].map((proc, i) => (
                       <div
                         key={i}
-                        className="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-1.5"
+                        className="p-3 bg-workstation-bg rounded-lg border border-white/5 space-y-1.5"
                       >
-                        <h5 className="font-bold text-cyan-400">{proc.title}</h5>
+                        <h5 className="font-bold text-workstation-accent">{proc.title}</h5>
                         <p className="text-slate-400 text-[11px] leading-relaxed">{proc.steps}</p>
                         <button
                           onClick={() => {
                             setMmMode(proc.targetMode as any);
                             setActiveTab('POWER_DMM');
                           }}
-                          className="text-[11px] font-mono text-cyan-400 hover:underline pt-1 inline-block"
+                          className="text-[11px] font-mono text-workstation-accent hover:underline pt-1 inline-block"
                         >
                           Configure Instruments for this Test →
                         </button>
@@ -1271,7 +1366,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
 
       {/* Floating Bottom HUD for Mobile / Connector View Mode */}
       {layoutMode === 'CONNECTOR' && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 border-t border-cyan-500/40 p-2.5 sm:p-3 px-4 sm:px-6 shadow-2xl backdrop-blur-md flex flex-wrap items-center justify-between font-mono text-xs gap-2">
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-workstation-panel/95 border-t border-workstation-accent/40 p-2.5 sm:p-3 px-4 sm:px-6 shadow-2xl backdrop-blur-md flex flex-wrap items-center justify-between font-mono text-xs gap-2">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <span className="text-slate-400 text-[11px]">DMM:</span>
@@ -1285,7 +1380,7 @@ export const VirtualBenchWorkbench: React.FC<VirtualBenchWorkbenchProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleSaveCurrentReading}
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold rounded text-[11px]"
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-workstation-accent hover:bg-workstation-accent-light text-workstation-bg font-bold rounded text-[11px]"
             >
               <Save className="w-3.5 h-3.5" />
               <span>Log</span>

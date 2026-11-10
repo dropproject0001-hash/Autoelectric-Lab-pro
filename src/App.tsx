@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { VEHICLE_DATABASE } from './data/automotiveDatabase';
 import { VehicleProfile, BenchReading, ConnectorPin, ElectricalFault } from './types/automotive';
-import { Header } from './components/Header';
+import { AppShell } from './components/AppShell';
+import { Overview } from './components/Overview';
 import { VirtualBenchWorkbench } from './components/VirtualBenchWorkbench';
 import { WiringDiagramExplorer } from './components/WiringDiagramExplorer';
 import { EcuPinoutExplorer } from './components/EcuPinoutExplorer';
@@ -14,14 +15,14 @@ import { TestReportModal } from './components/TestReportModal';
 import { SystemHealthTests } from './components/SystemHealthTests';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('workbench');
+  const [activeTab, setActiveTab] = useState<string>('overview');
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleProfile>(VEHICLE_DATABASE[0]);
   const [selectedPinNumber, setSelectedPinNumber] = useState<number | null>(1); // Pin 1
   const [showVehicleModal, setShowVehicleModal] = useState<boolean>(false);
   const [showReportModal, setShowReportModal] = useState<boolean>(false);
   const [showTestsModal, setShowTestsModal] = useState<boolean>(false);
 
-  // Active bench readings log (pre-populated with 2 sample verified readings)
+  // Active bench readings log
   const [benchReadings, setBenchReadings] = useState<BenchReading[]>([
     {
       id: 'read-init-1',
@@ -82,79 +83,100 @@ export default function App() {
   const activePinObj = allPins.find((p) => p.pinNumber === selectedPinNumber) || null;
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
-      {/* Universal Top Bar */}
-      <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        selectedVehicle={selectedVehicle}
-        onOpenVehicleModal={() => setShowVehicleModal(true)}
-        onOpenReportModal={() => setShowReportModal(true)}
-        onOpenTestsModal={() => setShowTestsModal(true)}
-        systemPowerOn={true}
-      />
+    <AppShell
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      selectedVehicle={selectedVehicle}
+      onOpenVehicleModal={() => setShowVehicleModal(true)}
+      onOpenReportModal={() => setShowReportModal(true)}
+      onOpenTestsModal={() => setShowTestsModal(true)}
+    >
+      {activeTab === 'overview' && (
+        <Overview 
+          vehicle={selectedVehicle} 
+          readings={benchReadings} 
+          onNavigate={setActiveTab} 
+        />
+      )}
 
-      {/* Main Workspace Stage */}
-      <main className="flex-1 overflow-hidden relative">
-        {activeTab === 'workbench' && (
-          <VirtualBenchWorkbench
-            vehicle={selectedVehicle}
-            initialPinNumber={selectedPinNumber}
-            onLogReading={handleAddReading}
-            onAskAiAboutReading={handleAskAiAboutReading}
-          />
-        )}
+      {activeTab === 'workbench' && (
+        <VirtualBenchWorkbench
+          vehicle={selectedVehicle}
+          initialPinNumber={selectedPinNumber}
+          onLogReading={handleAddReading}
+          onAskAiAboutReading={handleAskAiAboutReading}
+        />
+      )}
 
-        {activeTab === 'scanner' && (
-          <SchematicPcbScanner
-            vehicle={selectedVehicle}
-            onSendPinToBench={handleSelectPinForBench}
-          />
-        )}
+      {activeTab === 'scanner' && (
+        <SchematicPcbScanner
+          vehicle={selectedVehicle}
+          onSendPinToBench={handleSelectPinForBench}
+        />
+      )}
 
-        {activeTab === 'wiring' && (
-          <WiringDiagramExplorer
-            vehicle={selectedVehicle}
-            onSelectPinForBench={handleSelectPinForBench}
-          />
-        )}
+      {activeTab === 'wiring' && (
+        <WiringDiagramExplorer
+          vehicle={selectedVehicle}
+          onSelectPinForBench={handleSelectPinForBench}
+        />
+      )}
 
-        {activeTab === 'pinouts' && (
-          <EcuPinoutExplorer
-            vehicle={selectedVehicle}
-            selectedPinNumber={selectedPinNumber}
-            onSelectPin={(pinNum) => setSelectedPinNumber(pinNum)}
-            onSendToBench={handleSelectPinForBench}
-          />
-        )}
+      {activeTab === 'pinouts' && (
+        <EcuPinoutExplorer
+          vehicle={selectedVehicle}
+          selectedPinNumber={selectedPinNumber}
+          onSelectPin={(pinNum) => setSelectedPinNumber(pinNum)}
+          onSendToBench={handleSelectPinForBench}
+        />
+      )}
 
-        {activeTab === 'readings' && (
-          <ComponentReadingsLab
-            vehicle={selectedVehicle}
-            readings={benchReadings}
-            onAddReading={handleAddReading}
-            onDeleteReading={handleDeleteReading}
-            onExportPdf={() => setShowReportModal(true)}
-            onSelectPinForBench={handleSelectPinForBench}
-          />
-        )}
+      {activeTab === 'database' && (
+        <EcuPinoutExplorer
+          vehicle={selectedVehicle}
+          selectedPinNumber={selectedPinNumber}
+          onSelectPin={(pinNum) => setSelectedPinNumber(pinNum)}
+          onSendToBench={handleSelectPinForBench}
+        />
+      )}
 
-        {activeTab === 'dtc' && (
-          <DtcTroubleshooting
-            vehicle={selectedVehicle}
-            onSelectPinForBench={handleSelectPinForBench}
-          />
-        )}
+      {activeTab === 'readings' && (
+        <ComponentReadingsLab
+          vehicle={selectedVehicle}
+          readings={benchReadings}
+          onAddReading={handleAddReading}
+          onDeleteReading={handleDeleteReading}
+          onExportPdf={() => setShowReportModal(true)}
+          onSelectPinForBench={handleSelectPinForBench}
+        />
+      )}
 
-        {activeTab === 'ai-assistant' && (
-          <AiEngineeringAssistant
-            vehicle={selectedVehicle}
-            selectedPin={activePinObj}
-            readings={benchReadings}
-            activeFault={activeFault}
-          />
-        )}
-      </main>
+      {activeTab === 'dtc' && (
+        <DtcTroubleshooting
+          vehicle={selectedVehicle}
+          onSelectPinForBench={handleSelectPinForBench}
+        />
+      )}
+
+      {activeTab === 'ai-assistant' && (
+        <AiEngineeringAssistant
+          vehicle={selectedVehicle}
+          selectedPin={activePinObj}
+          readings={benchReadings}
+          activeFault={activeFault}
+        />
+      )}
+
+      {activeTab === 'reports' && (
+        <ComponentReadingsLab
+          vehicle={selectedVehicle}
+          readings={benchReadings}
+          onAddReading={handleAddReading}
+          onDeleteReading={handleDeleteReading}
+          onExportPdf={() => setShowReportModal(true)}
+          onSelectPinForBench={handleSelectPinForBench}
+        />
+      )}
 
       {/* Modals */}
       {showVehicleModal && (
@@ -181,6 +203,6 @@ export default function App() {
           onClose={() => setShowTestsModal(false)}
         />
       )}
-    </div>
+    </AppShell>
   );
 }

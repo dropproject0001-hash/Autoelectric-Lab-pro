@@ -255,16 +255,16 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-100 overflow-hidden font-sans">
+    <div className="flex flex-col h-full bg-workstation-bg text-slate-100 overflow-hidden font-sans">
       {/* Top Engineering Module Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b border-slate-800 bg-slate-900/60 shrink-0">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b border-white/5 bg-workstation-panel/60 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-950 border border-cyan-500/40 text-cyan-400 font-bold shrink-0">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-workstation-accent/10 border border-workstation-accent/40 text-workstation-accent font-bold shrink-0">
             <Cpu className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
+              <span className="text-xs font-mono text-workstation-accent uppercase tracking-wider">
                 AI SCHEMATIC & PCB INTELLIGENCE SCANNER
               </span>
               <span className="text-slate-600">·</span>
@@ -279,7 +279,7 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
         {/* Action Controls Header Toolbar */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Zoom controls */}
-          <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
+          <div className="flex items-center gap-1 bg-workstation-bg p-1 rounded-lg border border-white/5">
             <button onClick={() => handleZoom(-0.2)} className="p-1 text-slate-400 hover:text-white rounded" title="Zoom Out">
               <ZoomOut className="w-3.5 h-3.5" />
             </button>
@@ -287,7 +287,7 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
             <button onClick={() => handleZoom(0.2)} className="p-1 text-slate-400 hover:text-white rounded" title="Zoom In">
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
-            <button onClick={resetZoomAndPan} className="p-1 text-slate-400 hover:text-cyan-400 rounded" title="Reset Zoom & Pan">
+            <button onClick={resetZoomAndPan} className="p-1 text-slate-400 hover:text-workstation-accent rounded" title="Reset Zoom & Pan">
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -298,7 +298,7 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg border transition-all whitespace-nowrap ${
               isAddingAnnotation
                 ? 'bg-purple-900/70 border-purple-400 text-purple-200 animate-pulse font-bold shadow'
-                : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300'
+                : 'bg-workstation-bg hover:bg-white/5 border-white/5 text-slate-300'
             }`}
           >
             <PlusCircle className="w-3.5 h-3.5 text-purple-400" />
@@ -308,18 +308,18 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
           {/* Board Comparison button */}
           <button
             onClick={() => setShowComparison(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg bg-workstation-bg hover:bg-white/5 border border-white/5 text-slate-200 transition-colors whitespace-nowrap"
           >
-            <Columns className="w-3.5 h-3.5 text-cyan-400" />
+            <Columns className="w-3.5 h-3.5 text-workstation-accent" />
             <span>Compare Revisions</span>
           </button>
 
           {/* Circuit Net Tracer button */}
           <button
             onClick={() => setShowNetTracer(!showNetTracer)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg bg-workstation-bg hover:bg-white/5 border border-white/5 text-slate-200 transition-colors whitespace-nowrap"
           >
-            <Activity className="w-3.5 h-3.5 text-cyan-400" />
+            <Activity className="w-3.5 h-3.5 text-workstation-accent" />
             <span>Net Tracer</span>
           </button>
 
@@ -327,7 +327,7 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
           {selectedComp && (
             <button
               onClick={() => setShowCorrectionModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/40 text-amber-300 transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg bg-status-warning/10 hover:bg-status-warning/20 border border-status-warning/40 text-status-warning transition-colors whitespace-nowrap"
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Verify / Edit {selectedComp.refDes}</span>
@@ -337,7 +337,7 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
           {/* Export Report button */}
           <button
             onClick={() => setShowExportModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition-colors shadow-sm whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-workstation-accent text-workstation-bg hover:bg-workstation-accent-light transition-colors shadow-sm whitespace-nowrap"
           >
             <Download className="w-3.5 h-3.5 shrink-0" />
             <span>PDF Technical Report</span>
@@ -346,9 +346,9 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
       </div>
 
       {/* State-Based Layer View Manager Control Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2 border-b border-slate-800/80 bg-slate-950/90 font-mono text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2 border-b border-white/5 bg-workstation-panel/90 font-mono text-xs">
         <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-cyan-400 shrink-0" />
+          <Layers className="w-4 h-4 text-workstation-accent shrink-0" />
           <span className="text-slate-400 font-bold uppercase tracking-wider text-[11px]">State Layer Manager:</span>
         </div>
 
@@ -358,8 +358,8 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
             onClick={() => applyPreset('ALL')}
             className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all ${
               layers.showPhotoBase && layers.showComponents && layers.showTraces && layers.showAnnotations
-                ? 'bg-cyan-950 text-cyan-300 border-cyan-500/50'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                ? 'bg-workstation-accent/10 text-workstation-accent border-workstation-accent/50'
+                : 'bg-workstation-bg text-slate-400 border-white/5 hover:text-slate-200'
             }`}
           >
             All Layers On
@@ -368,8 +368,8 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
             onClick={() => applyPreset('COMPONENTS')}
             className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all ${
               layers.showComponents && !layers.showTraces && !layers.showAnnotations
-                ? 'bg-cyan-950 text-cyan-300 border-cyan-500/50'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                ? 'bg-workstation-accent/10 text-workstation-accent border-workstation-accent/50'
+                : 'bg-workstation-bg text-slate-400 border-white/5 hover:text-slate-200'
             }`}
           >
             Components Only
@@ -378,8 +378,8 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
             onClick={() => applyPreset('TRACES')}
             className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all ${
               !layers.showComponents && layers.showTraces && !layers.showAnnotations
-                ? 'bg-cyan-950 text-cyan-300 border-cyan-500/50'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                ? 'bg-workstation-accent/10 text-workstation-accent border-workstation-accent/50'
+                : 'bg-workstation-bg text-slate-400 border-white/5 hover:text-slate-200'
             }`}
           >
             Traces & Nets
@@ -388,8 +388,8 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
             onClick={() => applyPreset('ANNOTATIONS')}
             className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all ${
               !layers.showComponents && !layers.showTraces && layers.showAnnotations
-                ? 'bg-cyan-950 text-cyan-300 border-cyan-500/50'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                ? 'bg-workstation-accent/10 text-workstation-accent border-workstation-accent/50'
+                : 'bg-workstation-bg text-slate-400 border-white/5 hover:text-slate-200'
             }`}
           >
             Annotations Only
@@ -398,8 +398,8 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
             onClick={() => applyPreset('PHOTO_ONLY')}
             className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all ${
               layers.showPhotoBase && !layers.showComponents && !layers.showTraces && !layers.showAnnotations
-                ? 'bg-cyan-950 text-cyan-300 border-cyan-500/50'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                ? 'bg-workstation-accent/10 text-workstation-accent border-workstation-accent/50'
+                : 'bg-workstation-bg text-slate-400 border-white/5 hover:text-slate-200'
             }`}
           >
             Bare Hardware Photo
@@ -408,8 +408,8 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
             onClick={() => applyPreset('HIGH_CONTRAST')}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all ${
               layers.photoHighContrast
-                ? 'bg-amber-950 text-amber-300 border-amber-500/50 font-bold shadow'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                ? 'bg-status-warning/10 text-status-warning border-status-warning/50 font-bold shadow'
+                : 'bg-workstation-bg text-slate-400 border-white/5 hover:text-slate-200'
             }`}
           >
             <Sun className="w-3 h-3 text-amber-400 shrink-0" />
@@ -418,14 +418,14 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
         </div>
 
         {/* Individual Layer Toggle Switches */}
-        <div className="flex items-center gap-3 border-l border-slate-800 pl-3">
+        <div className="flex items-center gap-3 border-l border-white/5 pl-3">
           <button
             onClick={() => toggleLayer('showPhotoBase')}
             className={`flex items-center gap-1 text-[11px] transition-colors ${
               layers.showPhotoBase ? 'text-slate-200 font-bold' : 'text-slate-500 line-through'
             }`}
           >
-            {layers.showPhotoBase ? <Eye className="w-3.5 h-3.5 text-cyan-400" /> : <EyeOff className="w-3.5 h-3.5" />}
+            {layers.showPhotoBase ? <Eye className="w-3.5 h-3.5 text-workstation-accent" /> : <EyeOff className="w-3.5 h-3.5" />}
             <span>Base Image</span>
           </button>
 
@@ -435,7 +435,7 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
               layers.showComponents ? 'text-slate-200 font-bold' : 'text-slate-500 line-through'
             }`}
           >
-            {layers.showComponents ? <Eye className="w-3.5 h-3.5 text-emerald-400" /> : <EyeOff className="w-3.5 h-3.5" />}
+            {layers.showComponents ? <Eye className="w-3.5 h-3.5 text-status-success" /> : <EyeOff className="w-3.5 h-3.5" />}
             <span>Components ({activeProject?.components.length || 0})</span>
           </button>
 
@@ -445,7 +445,7 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
               layers.showTraces ? 'text-slate-200 font-bold' : 'text-slate-500 line-through'
             }`}
           >
-            {layers.showTraces ? <Eye className="w-3.5 h-3.5 text-sky-400" /> : <EyeOff className="w-3.5 h-3.5" />}
+            {layers.showTraces ? <Eye className="w-3.5 h-3.5 text-workstation-secondary" /> : <EyeOff className="w-3.5 h-3.5" />}
             <span>Nets ({activeProject?.nets.length || 0})</span>
           </button>
 

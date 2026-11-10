@@ -29,9 +29,12 @@ for (const vehicle of VEHICLE_DATABASE) {
     for (const pin of conn.pins) {
       totalPinsTested++;
 
-      // Check essential data fields
+      // Check essential data fields & Phase 1 provenance
       if (!pin.label || !pin.functionDesc || !pin.signalType || !pin.wireColor) {
         errorsFound.push(`Pin #${pin.pinNumber} in ${vehicle.make} ${conn.name} is missing essential descriptors.`);
+      }
+      if (!pin.provenance || !pin.verificationSource) {
+        errorsFound.push(`Pin #${pin.pinNumber} in ${vehicle.make} ${conn.name} is missing authoritative provenance source.`);
       }
 
       if (pin.isPopulated && pin.signalType !== 'RESERVED_NC') {

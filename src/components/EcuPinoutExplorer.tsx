@@ -298,7 +298,7 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
   };
 
   const getPinCircleColor = (pin: ConnectorPin, isSelected: boolean) => {
-    if (isSelected) return 'bg-cyan-400 text-slate-950 ring-2 ring-cyan-300 font-bold shadow-lg scale-105 z-10';
+    if (isSelected) return 'bg-workstation-accent text-workstation-bg ring-2 ring-workstation-accent/50 font-bold shadow-lg scale-105 z-10';
     if (!pin.isPopulated || pin.signalType === 'RESERVED_NC') {
       return 'bg-slate-950/40 border-dashed border-slate-800 text-slate-600 hover:border-slate-700';
     }
@@ -334,12 +334,12 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
   const wireInfo = selectedPin ? parseWireColor(selectedPin.wireColor) : null;
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-100">
+    <div className="flex flex-col h-full bg-workstation-bg text-slate-100">
       {/* Top ECU Overview Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b border-slate-800 bg-slate-900/50">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b border-white/5 bg-workstation-panel/50">
         <div>
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
+            <span className="text-xs font-mono text-workstation-accent uppercase tracking-wider">
               {vehicle.make} · {vehicle.engineCode} · {vehicle.chassisCode}
             </span>
             <span className="text-slate-600">·</span>
@@ -352,12 +352,12 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Display Mode Switcher Tabs */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs font-mono">
+          <div className="flex items-center bg-workstation-bg p-1 rounded-lg border border-white/5 text-xs font-mono">
             <button
               onClick={() => setVisualDisplayMode('HARDWARE_PHOTO')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors ${
                 visualDisplayMode === 'HARDWARE_PHOTO'
-                  ? 'bg-cyan-500/20 text-cyan-400 font-bold border border-cyan-500/50'
+                  ? 'bg-workstation-accent/20 text-workstation-accent font-bold border border-workstation-accent/50'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -368,7 +368,7 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
               onClick={() => setVisualDisplayMode('PROBE_GUIDE_PHOTO')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors ${
                 visualDisplayMode === 'PROBE_GUIDE_PHOTO'
-                  ? 'bg-cyan-500/20 text-cyan-400 font-bold border border-cyan-500/50'
+                  ? 'bg-workstation-accent/20 text-workstation-accent font-bold border border-workstation-accent/50'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -379,7 +379,7 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
               onClick={() => setVisualDisplayMode('CAVITY_MATRIX')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors ${
                 visualDisplayMode === 'CAVITY_MATRIX'
-                  ? 'bg-cyan-500/20 text-cyan-400 font-bold border border-cyan-500/50'
+                  ? 'bg-workstation-accent/20 text-workstation-accent font-bold border border-workstation-accent/50'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -399,10 +399,10 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
             onClick={() =>
               setViewOrientation((prev) => (prev === 'RECEPTACLE' ? 'HARNESS_PLUG' : 'RECEPTACLE'))
             }
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg bg-workstation-bg hover:bg-white/5 border border-white/5 text-slate-300 transition-colors whitespace-nowrap"
             title="Toggle between ECU metal socket view and wiring harness side view"
           >
-            <RotateCw className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <RotateCw className="w-3.5 h-3.5 text-workstation-accent shrink-0" />
             <span>
               View: {viewOrientation === 'RECEPTACLE' ? 'ECU Metal Socket (Front)' : 'Harness Wire Plug (Mirrored)'}
             </span>
@@ -456,7 +456,7 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
               </div>
 
               {/* Connector Selector Tabs under Photo */}
-              <div className="p-4 bg-slate-950 border-t border-slate-800">
+              <div className="p-4 bg-workstation-bg border-t border-white/5">
                 <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-2 font-bold">
                   Select ECU Socket Receptacle Header:
                 </span>
@@ -469,15 +469,15 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
                         onClick={() => setSelectedConnectorId(conn.id)}
                         className={`p-3 rounded-xl border flex flex-col justify-between transition-all text-left ${
                           isActive
-                            ? 'bg-slate-900 border-cyan-400 ring-2 ring-cyan-500/40 shadow-lg'
-                            : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
+                            ? 'bg-workstation-panel border-workstation-accent ring-2 ring-workstation-accent/40 shadow-lg'
+                            : 'bg-white/5 border-white/5 hover:bg-white/10'
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-bold font-mono text-white">{conn.name}</span>
                           <span
                             className={`w-2 h-2 rounded-full ${
-                              isActive ? 'bg-cyan-400 animate-ping' : 'bg-slate-600'
+                              isActive ? 'bg-workstation-accent animate-ping' : 'bg-slate-600'
                             }`}
                           />
                         </div>
@@ -494,8 +494,8 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
 
           {/* VISUAL DISPLAY MODE 2: PROBE CONNECTION GUIDE PHOTO & CHECKLIST */}
           {visualDisplayMode === 'PROBE_GUIDE_PHOTO' && (
-            <div className="bg-slate-900 border-2 border-slate-800 rounded-2xl overflow-hidden shadow-2xl mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 sm:p-6 bg-slate-950">
+            <div className="bg-workstation-panel border-2 border-white/5 rounded-2xl overflow-hidden shadow-2xl mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 sm:p-6 bg-workstation-bg">
                 {/* Macro Probe Photo */}
                 <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-800 shadow-md">
                   <img
@@ -503,7 +503,7 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
                     alt="ECU Multimeter Bench Probe Attachment Guide"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-2 left-2 bg-slate-950/90 backdrop-blur-md px-3 py-1 rounded text-[10px] font-mono text-cyan-400 font-bold border border-cyan-500/30">
+                  <div className="absolute top-2 left-2 bg-workstation-bg/90 backdrop-blur-md px-3 py-1 rounded text-[10px] font-mono text-workstation-accent font-bold border border-workstation-accent/30">
                     MACRO BENCH PROBE GUIDE
                   </div>
                 </div>
@@ -830,15 +830,15 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
               )}
 
               {/* LIVE INTERACTIVE PIN ELECTRICAL SIMULATION & MINI-SCOPE */}
-              <div className="bg-slate-950 p-4 rounded-xl border-2 border-cyan-500/40 shadow-xl space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+              <div className="bg-workstation-bg p-4 rounded-xl border-2 border-workstation-accent/40 shadow-xl space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-white/10">
                   <div className="flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-cyan-400 animate-pulse" />
+                    <Activity className="w-4 h-4 text-workstation-accent animate-pulse" />
                     <span className="font-mono text-xs font-bold text-white uppercase">
                       Live Electrical Pin Simulation
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-500/30">
+                  <span className="text-[10px] font-mono text-workstation-accent bg-workstation-accent/10 px-2 py-0.5 rounded border border-workstation-accent/30">
                     REAL PHYSICS
                   </span>
                 </div>
@@ -1005,8 +1005,15 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
               </div>
 
               {/* Provenance and Source Citation */}
-              <div className="pt-2 border-t border-slate-800 text-[11px] text-slate-500 space-y-1">
-                <span className="font-semibold text-slate-400 block">Documentation Provenance:</span>
+              <div className="pt-2 border-t border-slate-800 text-[11px] text-slate-500 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-slate-400">Documentation Provenance:</span>
+                  {selectedPin.provenance && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950/80 text-cyan-400 border border-cyan-500/40">
+                      {selectedPin.provenance.replace(/_/g, ' ')}
+                    </span>
+                  )}
+                </div>
                 <p className="italic text-slate-400">{selectedPin.verificationSource}</p>
               </div>
 
@@ -1014,7 +1021,7 @@ export const EcuPinoutExplorer: React.FC<EcuPinoutExplorerProps> = ({
               {onSendToBench && (
                 <button
                   onClick={() => onSendToBench(selectedPin.pinNumber)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-lg transition-colors shadow-sm mt-4"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-workstation-bg bg-workstation-accent hover:bg-workstation-accent-light rounded-lg transition-colors shadow-sm mt-4"
                 >
                   <Zap className="w-4 h-4 shrink-0" />
                   <span>Connect Multimeter Probe to Pin #{selectedPin.pinNumber}</span>

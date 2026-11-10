@@ -13,13 +13,15 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
     market: 'Philippines / Southeast Asia (AN120 / AN130)',
     ecuManufacturer: 'Denso',
     ecuModel: 'Gen 8 Common Rail CRS3 (2500 Bar)',
-    ecuPartNumber: '89661-0KV10',
+    ecuPartNumber: '89661-0KB10',
+    ecuPartVariants: ['89661-0KB10 (MT)', '89661-0KV10 (AT)', '89661-0KV70 (Euro 4)'],
     hardwareNumber: '275900-5420',
-    softwareNumber: '89663-0KV12',
+    softwareNumber: '89663-0KB12',
     socketCount: 4,
     verifiedStatus: 'VERIFIED',
     pinoutSource: 'Toyota Hilux Electrical Wiring Diagram (EM26F0E) Section 2-A / 2-B',
-    description: 'Denso 4-socket Gen-8 ECU specifically calibrated for the Philippine-market Toyota Hilux Revo 2.8L (GUN126). Features piezoelectric common rail fuel injection, variable nozzle turbocharger, and DPF exhaust aftertreatment.',
+    description: 'Denso 4-socket Gen-8 ECU specifically calibrated for the Philippine-market Toyota Hilux Revo 2.8L (GUN126). Features piezoelectric common rail fuel injection, variable nozzle turbocharger, and DPF exhaust aftertreatment. NOTE: Part number 89661-0KB10 is typically for manual transmission, while 89661-0KV10 is for automatic transmission variants.',
+    provenance: 'OEM_WIRING_DIAGRAM',
     completenessReports: [
       { connectorId: 'conn-a', connectorName: 'Connector A (34-Pin Engine & Output)', totalCavities: 34, populatedCount: 28, verifiedCount: 26, unverifiedCount: 2, blankCount: 6, completenessPct: 92.8 },
       { connectorId: 'conn-b', connectorName: 'Connector B (35-Pin Sensors & Feedback)', totalCavities: 35, populatedCount: 30, verifiedCount: 30, unverifiedCount: 0, blankCount: 5, completenessPct: 100.0 },
@@ -60,6 +62,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'High-voltage capacitive boost ~80V peak on scope, then 14A PWM hold; high impedance when unpowered',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD (EM26F0E) Sec. 2-A p. 44',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Engine misfire cylinder 1, DTC P0201 or P062D'
           },
           {
@@ -86,6 +89,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'High-voltage boost ~80V peak then PWM hold',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Sec. 2-A p. 45',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Engine misfire cylinder 2, DTC P0202'
           },
           {
@@ -108,6 +112,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Low-side driver clamp voltage',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Sec. 2-A p. 45',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Misfire cylinder 3, DTC P0203'
           },
           {
@@ -130,6 +135,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Low-side driver clamp voltage',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Sec. 2-A p. 46',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Misfire cylinder 4, DTC P0204'
           },
           {
@@ -152,6 +158,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Direct solid ground with zero potential offset',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Denso CRS3 Technical Manual Doc #CR-CRS-1GD-02',
+            provenance: 'MANUFACTURER_DATASHEET',
             failureSymptom: 'Blown injector driver, erratic injector firing, high ground offset'
           },
           {
@@ -174,6 +181,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Direct continuity < 0.1 Ohm to internal power ground plane',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Sec. Ground Network',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'High ground offset, intermittent sensor errors'
           },
           {
@@ -196,6 +204,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Switched battery voltage through main relay',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Denso CRS Service Manual HP5 Fuel Pump Section',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'No fuel rail pressure build-up, crank no start, DTC P0087/P0628'
           },
           {
@@ -218,6 +227,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Active PWM pull-down to regulate fuel suction volume',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux Service Manual - Fuel System Diagnostics',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Rail pressure runaway or zero pressure, DTC P0088 / P0089'
           },
           {
@@ -237,6 +247,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Open circuit',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Connector Pin Cavity Table',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'None'
           },
           {
@@ -259,6 +270,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Low noise analog/digital ground plane reference',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Section 4 Engine Control',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'ECU resets, spurious ADC conversion errors'
           }
         ]
@@ -296,6 +308,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Precise 5.00V ± 0.05V output; maximum load capacity 200mA',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD 1GD Sensor Network Map p. 88',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Engine fails to start, DTC P0641 (Sensor Reference Voltage A Circuit Open/Short)'
           },
           {
@@ -318,6 +331,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Isolated return inside ECU with zero offset to analog ADC ground',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD 1GD Sensor Network Map p. 89',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'All sensor analog readings skew high (fake high fuel pressure or temp)'
           },
           {
@@ -340,6 +354,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Linear voltage: V = 0.5V + (Rail_bar * 0.0016V)',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Denso CRS3 High-Pressure System Specification',
+            provenance: 'MANUFACTURER_DATASHEET',
             failureSymptom: 'P0190, P0192, P0193; Engine stalls or enters severe fuel limp mode'
           },
           {
@@ -362,6 +377,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Analog voltage rises proportionally to turbo boost pressure',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux Service Manual - Boost Pressure Diagnostics',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Lack of turbo boost power, black smoke, DTC P0105 / P0106 / P0107'
           },
           {
@@ -384,6 +400,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: '36-2 AC sine wave with double missing tooth sync gap',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Denso CRS3 Sensor Diagnostics - Crank Signal Guide',
+            provenance: 'MANUFACTURER_DATASHEET',
             failureSymptom: 'Crank, no start, tachometer dead, DTC P0335'
           },
           {
@@ -406,6 +423,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Differential return path for inductive sensor coil',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Denso CRS3 Sensor Diagnostics',
+            provenance: 'MANUFACTURER_DATASHEET',
             failureSymptom: 'Weak signal, timing jitter'
           }
         ]
@@ -441,6 +459,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Full battery supply to internal 5V step-down regulator and drivers',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Power Distribution Section p. 12',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'ECU completely unpowered, scan tool cannot communicate, DTC U0100'
           },
           {
@@ -463,6 +482,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Parallel connection to +B internally to distribute current',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Power Distribution Section p. 12',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'High resistance voltage drop under heavy actuator load'
           },
           {
@@ -487,6 +507,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Triggers ECU power management IC to pull down M-REL line',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Engine Management Wake-Up Diagram',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Key turned to ON but check engine light does not illuminate; ECU stays asleep'
           },
           {
@@ -509,6 +530,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Direct solid ground with zero voltage drop under load',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Hilux EWD Ground Distribution Map',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Burned ground traces inside ECU PCB when external ground wire is loose'
           }
         ]
@@ -546,6 +568,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Recessive 2.5V, dominant pulses up to 3.5V during data transmission',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Multiplex Communication System (CAN) Manual',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Loss of communication with TCM, ABS, Kombi; DTC U0100 / U0101'
           },
           {
@@ -572,6 +595,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Differential mirror waveform to CAN-H (Vdiff = 2.0V dominant)',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Multiplex Communication System (CAN) Manual',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Network bus-off, scan tool communication impossible'
           }
         ]
@@ -596,6 +620,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
     socketCount: 4,
     verifiedStatus: 'VERIFIED',
     pinoutSource: 'Toyota Fortuner Repair Manual (RM32G0E) Engine Control Sec. 2',
+    provenance: 'OEM_MANUAL',
     description: 'Denso Gen 8 ECU calibrated specifically for the 7-seater Toyota Fortuner (GUN156) chassis. Distinct pin wiring for dual rear air-conditioning cut-off relay and body stability management compared to Hilux pickup.',
     completenessReports: [
       { connectorId: 'ft-conn-a', connectorName: 'Connector A (34-Pin Engine)', totalCavities: 34, populatedCount: 29, verifiedCount: 29, unverifiedCount: 0, blankCount: 5, completenessPct: 100.0 },
@@ -629,6 +654,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'High-voltage boost ~80V on scope',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Fortuner RM32G0E Sec. Fuel Injection p. 112',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Misfire cylinder 1, P0201'
           },
           {
@@ -647,6 +673,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Solid ground',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Fortuner RM32G0E',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Erratic injector firing'
           }
         ]
@@ -676,6 +703,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Stable 5.0V',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Fortuner EWD 2018',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'P0641'
           },
           {
@@ -693,6 +721,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Linear voltage',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Fortuner Repair Manual',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'P0190'
           }
         ]
@@ -717,6 +746,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
     socketCount: 4,
     verifiedStatus: 'VERIFIED',
     pinoutSource: 'Toyota Innova Electrical Wiring Manual (EM28H0E) Sec. 3',
+    provenance: 'OEM_WIRING_DIAGRAM',
     description: 'Denso Gen 8 ECU calibrated for the 2.4L 2GD-FTV Innova MPV platform with specific automatic transmission interlock circuits.',
     completenessReports: [
       { connectorId: 'in-conn-a', connectorName: 'Connector A (34-Pin Engine)', totalCavities: 34, populatedCount: 26, verifiedCount: 26, unverifiedCount: 0, blankCount: 8, completenessPct: 100.0 },
@@ -748,6 +778,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Boost ~80V on scope',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Innova EWD EM28H0E',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Misfire cyl 1'
           },
           {
@@ -766,6 +797,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Direct ground',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Toyota Innova EWD EM28H0E',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'High ground offset'
           }
         ]
@@ -790,6 +822,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
     socketCount: 2,
     verifiedStatus: 'VERIFIED',
     pinoutSource: 'Isuzu Global Service System (GSS) D-MAX TF Series Wiring Manual Sec. 6E',
+    provenance: 'OEM_WIRING_DIAGRAM',
     description: 'Transtron heavy-duty cast aluminum dual-socket ECU for Isuzu D-MAX 4JJ1 engine. Highly reliable platform in Philippine commercial fleets.',
     completenessReports: [
       { connectorId: 'isuzu-conn-1', connectorName: 'Connector J1 (94-Pin Body & Power)', totalCavities: 94, populatedCount: 68, verifiedCount: 68, unverifiedCount: 0, blankCount: 26, completenessPct: 100.0 },
@@ -821,6 +854,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Constant memory feed',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Isuzu Workshop Manual TF Series Sec. 6E',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'No start, clock/calibration loss'
           },
           {
@@ -839,6 +873,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Wake up signal for MCU power sequence',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Isuzu GSS D-MAX Schematics',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'ECU does not wake up, CEL off'
           },
           {
@@ -859,6 +894,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'High speed powertrain data',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Isuzu Multiplex Bus Documentation',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'U0100 Lost Comm with ECM'
           },
           {
@@ -879,6 +915,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Differential mirror waveform',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Isuzu Multiplex Bus Documentation',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Bus-off error'
           }
         ]
@@ -910,6 +947,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Clean regulated DC',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Isuzu 4JJ1 Common Rail Workshop Manual',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'DTC P0642 / P0643'
           },
           {
@@ -928,6 +966,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Isolated return',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Isuzu 4JJ1 Service Manual',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Sensor voltage offsets'
           },
           {
@@ -946,6 +985,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: '0.5V to 4.5V output',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Transtron CRS Spec Sheet',
+            provenance: 'MANUFACTURER_DATASHEET',
             failureSymptom: 'P0191 / P0192'
           }
         ]
@@ -969,6 +1009,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
     socketCount: 4,
     verifiedStatus: 'VERIFIED',
     pinoutSource: 'Mitsubishi Motors Technical Information Manual Montero Sport Sec. 90',
+    provenance: 'OEM_MANUAL',
     description: 'Denso Common Rail ECU for Mitsubishi 4N15 engine with MIVEC variable valve timing and Variable Geometry Turbo.',
     completenessReports: [
       { connectorId: 'mitsu-conn-a', connectorName: 'Connector A (Main Power & CAN)', totalCavities: 35, populatedCount: 28, verifiedCount: 28, unverifiedCount: 0, blankCount: 7, completenessPct: 100.0 },
@@ -998,6 +1039,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Main system power feed',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Mitsubishi Motors Technical Manual Sec. 90 p. 110',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Complete ECU shutdown'
           },
           {
@@ -1015,6 +1057,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Power ground return',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Mitsubishi Montero Sport Wiring Diagram',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Burnt ECU circuit trace'
           },
           {
@@ -1032,6 +1075,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Clean regulated DC',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Denso Mitsubishi 4N15 Pinout Chart',
+            provenance: 'MANUFACTURER_DATASHEET',
             failureSymptom: 'DTC P0641'
           },
           {
@@ -1051,6 +1095,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'High speed CAN line',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Mitsubishi CAN-C Architecture Guide',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'U0100 Lost Comm with ECM'
           },
           {
@@ -1070,6 +1115,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'High speed CAN line',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Mitsubishi CAN-C Architecture Guide',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'U0100 / Bus Off'
           }
         ]
@@ -1093,6 +1139,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
     socketCount: 3,
     verifiedStatus: 'VERIFIED',
     pinoutSource: 'Ford Ranger Technical Wiring Manual 2015 Sec. 303-14',
+    provenance: 'OEM_WIRING_DIAGRAM',
     description: 'Continental SID208 engine controller for Ford Ranger and Everest with Siemens/Continental piezo common rail injectors.',
     completenessReports: [
       { connectorId: 'ford-conn-c1', connectorName: 'Connector C1 (96-Pin Engine Bay)', totalCavities: 96, populatedCount: 74, verifiedCount: 74, unverifiedCount: 0, blankCount: 22, completenessPct: 100.0 },
@@ -1122,6 +1169,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Direct battery power',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Ford Ranger WSM Sec. 303-14',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'No ECU boot'
           },
           {
@@ -1139,6 +1187,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Powers up internal DC-DC converter',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Ford Ranger Workshop Manual',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'Cluster shows immobilized'
           },
           {
@@ -1156,6 +1205,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Zero potential reference',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Ford Ranger EWD Ground Map',
+            provenance: 'OEM_WIRING_DIAGRAM',
             failureSymptom: 'Blown board capacitor'
           },
           {
@@ -1175,6 +1225,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Differential CAN packets',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Ford Motor Company Powertrain CAN Spec',
+            provenance: 'MANUFACTURER_DATASHEET',
             failureSymptom: 'No start, PATS immobilizer lockout'
           },
           {
@@ -1194,6 +1245,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Differential CAN packets',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Ford Motor Company Powertrain CAN Spec',
+            provenance: 'MANUFACTURER_DATASHEET',
             failureSymptom: 'Loss of TCM, ABS handshake'
           }
         ]
@@ -1217,6 +1269,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
     socketCount: 2,
     verifiedStatus: 'VERIFIED',
     pinoutSource: 'Bosch Technical Manual EDC17 Bench Pinout Guide',
+    provenance: 'MANUFACTURER_DATASHEET',
     description: 'Industry standard Bosch EDC17 bench repair and pinout model for Tricore bench supply, boot, GPT, CAN, and Kline.',
     completenessReports: [
       { connectorId: 'edc17-conn-1', connectorName: 'Connector 1 (Enginebay - 94 Pins)', totalCavities: 94, populatedCount: 65, verifiedCount: 65, unverifiedCount: 0, blankCount: 29, completenessPct: 100.0 },
@@ -1246,6 +1299,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Direct zero reference',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Bosch Technical Manual EDC17 Bench Pinout Guide',
+            provenance: 'MANUFACTURER_DATASHEET',
             failureSymptom: 'No boot'
           },
           {
@@ -1263,6 +1317,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Main power in',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Bosch Technical Manual',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'No power to MCU'
           },
           {
@@ -1280,6 +1335,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'MCU wake-up',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Bosch Technical Manual',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'ECU remains in sleep mode'
           },
           {
@@ -1299,6 +1355,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Differential CAN data',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Bosch CAN Bus Diagnostic Guide',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'No diagnostic communication'
           },
           {
@@ -1318,6 +1375,7 @@ export const VEHICLE_DATABASE: VehicleProfile[] = [
             expectedBehavior: 'Differential CAN data',
             verificationLevel: 'VERIFIED',
             verificationSource: 'Bosch CAN Bus Diagnostic Guide',
+            provenance: 'OEM_MANUAL',
             failureSymptom: 'No diagnostic communication'
           }
         ]

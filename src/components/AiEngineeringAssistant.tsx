@@ -139,7 +139,7 @@ You can ask me to:
               },
             ])
           }
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 rounded border border-slate-800 transition-colors whitespace-nowrap"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-slate-400 hover:text-white bg-workstation-bg hover:bg-white/5 rounded border border-white/5 transition-colors whitespace-nowrap"
           title="Clear chat and reset context"
         >
           <RotateCcw className="w-3.5 h-3.5" />
@@ -159,8 +159,8 @@ You can ask me to:
             <div
               className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-xs font-mono font-bold ${
                 msg.sender === 'USER'
-                  ? 'bg-cyan-500 text-slate-950 shadow-sm'
-                  : 'bg-slate-800 text-cyan-400 border border-slate-700'
+                  ? 'bg-workstation-accent text-workstation-bg shadow-sm'
+                  : 'bg-white/5 text-workstation-accent border border-white/10'
               }`}
             >
               {msg.sender === 'USER' ? <User className="w-4 h-4" /> : <Cpu className="w-4 h-4" />}
@@ -169,8 +169,8 @@ You can ask me to:
             <div
               className={`p-4 rounded-xl border text-xs leading-relaxed ${
                 msg.sender === 'USER'
-                  ? 'bg-cyan-950/40 border-cyan-500/30 text-cyan-100'
-                  : 'bg-slate-900/90 border-slate-800 text-slate-200'
+                  ? 'bg-workstation-accent/10 border-workstation-accent/30 text-white'
+                  : 'bg-workstation-panel/90 border-white/5 text-slate-200'
               }`}
             >
               <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-800/80 text-[10px] font-mono text-slate-500">
@@ -186,11 +186,11 @@ You can ask me to:
 
         {isLoading && (
           <div className="flex gap-3 max-w-md">
-            <div className="w-7 h-7 rounded-lg bg-slate-800 text-cyan-400 border border-slate-700 flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-white/5 text-workstation-accent border border-white/10 flex items-center justify-center shrink-0">
               <Cpu className="w-4 h-4 animate-spin" />
             </div>
-            <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-400 font-mono flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+            <div className="p-3 bg-workstation-panel border border-white/5 rounded-xl text-xs text-slate-400 font-mono flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-workstation-accent animate-ping" />
               <span>Synthesizing automotive engineering diagnostics...</span>
             </div>
           </div>
@@ -200,7 +200,7 @@ You can ask me to:
       </div>
 
       {/* Suggested Quick Question Chips */}
-      <div className="px-4 py-2 bg-slate-900/80 border-t border-slate-800 flex items-center gap-2 overflow-x-auto">
+      <div className="px-4 py-2 bg-workstation-panel/80 border-t border-white/5 flex items-center gap-2 overflow-x-auto">
         <span className="text-[10px] font-mono text-slate-500 whitespace-nowrap">
           Quick Inquiries:
         </span>
@@ -214,7 +214,7 @@ You can ask me to:
           <button
             key={i}
             onClick={() => handleSendMessage(promptText)}
-            className="px-2.5 py-1 text-[11px] font-mono text-slate-300 hover:text-white bg-slate-950 hover:bg-slate-800 rounded border border-slate-800 whitespace-nowrap transition-colors"
+            className="px-2.5 py-1 text-[11px] font-mono text-slate-300 hover:text-white bg-workstation-bg hover:bg-white/5 rounded border border-white/10 whitespace-nowrap transition-colors"
           >
             {promptText}
           </button>
@@ -222,7 +222,7 @@ You can ask me to:
       </div>
 
       {/* Input Bar */}
-      <div className="p-4 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
+      <div className="p-4 bg-workstation-panel border-t border-white/5 flex items-center gap-2">
         <input
           type="text"
           placeholder="Ask engineering question about this ECU, pinouts, bench testing, or wiring..."
@@ -235,12 +235,12 @@ You can ask me to:
             }
           }}
           disabled={isLoading}
-          className="flex-1 px-4 py-2.5 text-xs bg-slate-950 border border-slate-800 rounded-lg text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"
+          className="flex-1 px-4 py-2.5 text-xs bg-workstation-bg border border-white/5 rounded-lg text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-workstation-accent"
         />
         <button
           onClick={() => handleSendMessage()}
           disabled={!inputMessage.trim() || isLoading}
-          className="flex items-center justify-center px-4 py-2.5 text-xs font-semibold text-slate-950 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors shadow-sm"
+          className="flex items-center justify-center px-4 py-2.5 text-xs font-semibold text-workstation-bg bg-workstation-accent hover:bg-workstation-accent-light disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors shadow-sm"
         >
           <Send className="w-4 h-4" />
         </button>

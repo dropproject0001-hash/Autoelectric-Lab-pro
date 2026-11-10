@@ -64,15 +64,15 @@ export const WiringDiagramExplorer: React.FC<WiringDiagramExplorerProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-100">
+    <div className="flex flex-col h-full bg-workstation-bg text-slate-100">
       {/* Top Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b border-slate-800 bg-slate-900/60">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b border-white/5 bg-workstation-panel/60">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <Layers className="w-4 h-4 text-cyan-400 shrink-0" />
+            <Layers className="w-4 h-4 text-workstation-accent shrink-0" />
             <span className="font-semibold text-slate-200 whitespace-nowrap">Circuit System:</span>
           </div>
-          <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 overflow-x-auto max-w-full">
+          <div className="flex items-center gap-1 bg-workstation-bg p-1 rounded-lg border border-white/5 overflow-x-auto max-w-full">
             {WIRING_SYSTEMS.map((sys) => (
               <button
                 key={sys.id}
@@ -83,7 +83,7 @@ export const WiringDiagramExplorer: React.FC<WiringDiagramExplorerProps> = ({
                 }}
                 className={`px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                   selectedSystemId === sys.id
-                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
+                    ? 'bg-workstation-accent/10 text-workstation-accent border border-workstation-accent/30'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -112,7 +112,7 @@ export const WiringDiagramExplorer: React.FC<WiringDiagramExplorerProps> = ({
           </select>
 
           {/* Zoom controls */}
-          <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-md border border-slate-800 sm:ml-2">
+          <div className="flex items-center gap-1 bg-workstation-bg p-1 rounded-md border border-white/5 sm:ml-2">
             <button
               onClick={() => handleZoom(-0.15)}
               className="p-1 text-slate-400 hover:text-white rounded"
@@ -154,7 +154,7 @@ export const WiringDiagramExplorer: React.FC<WiringDiagramExplorerProps> = ({
             className="min-w-[900px] min-h-[550px] relative"
           >
             <svg
-              className="w-[960px] h-[560px] bg-slate-950/70 border border-slate-800/80 rounded-xl shadow-2xl"
+              className="w-[960px] h-[560px] bg-workstation-bg/70 border border-white/5 rounded-xl shadow-2xl"
               viewBox="0 0 960 560"
             >
               {/* Grid Background Lines inside SVG */}
@@ -348,7 +348,7 @@ export const WiringDiagramExplorer: React.FC<WiringDiagramExplorerProps> = ({
         </div>
 
         {/* Right Info Inspection Drawer */}
-        <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-slate-800 bg-slate-900/90 flex flex-col p-3 sm:p-4 overflow-y-auto max-h-[320px] lg:max-h-none">
+        <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-white/5 bg-workstation-panel/90 flex flex-col p-3 sm:p-4 overflow-y-auto max-h-[320px] lg:max-h-none">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
             <Info className="w-4 h-4 text-cyan-400" />
             <h3 className="text-sm font-bold text-slate-100">Circuit Inspection</h3>
