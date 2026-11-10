@@ -1,0 +1,940 @@
+Yes. This is a major feature, and I would make it a dedicated module called AI Schematic & PCB Intelligence Scanner inside AutoElectric Lab Pro.
+
+The idea is that a technician uploads an actual automotive ECU schematic, PCB layout, or clear photograph of a circuit board. The system analyzes the image, identifies components and their reference designators, maps connections, creates interactive overlays directly on the original image, and allows technicians to select components, trace electrical paths, inspect information, and perform virtual electrical tests.
+
+There is one important engineering distinction: a schematic, a PCB layout and a photograph of a physical PCB are different sources of information. The scanner must recognize which one it is analyzing. It must never invent hidden PCB connections, component values, or internal circuit paths that cannot be established from the supplied material.
+
+We can make this extremely powerful, but no AI vision system can honestly guarantee 100% accuracy on every uploaded image. The prompt below makes verification, traceability and uncertainty handling mandatory.
+
+### Master implementation prompt — AI Schematic & PCB Intelligence Scanner
+
+Copy the complete prompt below into your existing Google AI Studio project.
+
+# MAJOR FEATURE IMPLEMENTATION
+# AUTOELECTRIC LAB PRO — AI SCHEMATIC & PCB INTELLIGENCE SCANNER
+## RAMT Engineering Suite
+
+You are extending an existing professional automotive electrical engineering application.
+
+Implement a major new module named:
+
+**AI SCHEMATIC & PCB INTELLIGENCE SCANNER**
+
+This must become an integrated engineering tool inside AutoElectric Lab Pro - RAMT Engineering Suite.
+
+Do not rebuild the application. Preserve the existing branding, dark industrial laboratory design, navigation, ECU database, Virtual Bench Lab, electrical simulation engine, and existing working modules.
+
+This is not just an image viewer or an AI chatbot.
+
+Build an actual image-analysis, component-recognition, circuit-mapping, electrical-connectivity, interactive-overlay, and simulation system.
+
+The objective is to allow automotive technicians to upload actual ECU schematics, PCB diagrams, PCB photographs, circuit layouts, and technical documents, then interact with the analyzed image as an engineering workspace.
+
+# 1. MAIN OBJECTIVE
+
+Create a scanner that can:
+
+1. Import an actual automotive electrical schematic.
+2. Import an actual PCB layout.
+3. Import photographs of physical ECU circuit boards.
+4. Analyze and identify electronic components.
+5. Detect component reference designators.
+6. Identify symbols, terminals, connectors and test points.
+7. Extract component values and specifications when visible.
+8. Identify electrical connections and circuit paths.
+9. Create a searchable component database from the analyzed image.
+10. Draw interactive overlays directly over the original uploaded image.
+11. Allow technicians to select individual components and inspect their information.
+12. Trace electrical paths between components.
+13. Create an interactive circuit representation.
+14. Connect the analyzed circuit to the existing virtual instruments and simulation engine.
+15. Allow manual technician corrections and verification.
+
+The original uploaded image must remain visible and must be the reference layer for all mapped coordinates.
+
+# 2. SUPPORTED INPUT TYPES
+
+Implement an upload and document-import system supporting:
+
+- PNG.
+- JPG and JPEG.
+- WEBP.
+- PDF.
+- High-resolution scanned schematics.
+- PCB layout images.
+- PCB photographs.
+- Multi-page technical documents.
+
+Support multiple images belonging to the same ECU or circuit project.
+
+Allow technicians to upload:
+
+- ECU component placement diagrams.
+- ECU circuit schematics.
+- ECU PCB top-side photographs.
+- ECU PCB bottom-side photographs.
+- Power supply circuit diagrams.
+- Injector driver circuits.
+- Sensor input circuits.
+- CAN communication circuits.
+- Voltage regulator circuits.
+- Ground distribution diagrams.
+- Connector and pinout drawings.
+
+Preserve original file quality.
+
+Do not reduce image resolution in the stored source document.
+
+Generate optimized display versions separately when necessary.
+
+# 3. AUTOMATIC IMAGE TYPE CLASSIFICATION
+
+Before analyzing an upload, classify the document into one of these categories:
+
+A. ELECTRICAL SCHEMATIC
+
+A symbolic representation of electrical connections and circuit functions.
+
+B. PCB LAYOUT
+
+A board layout showing component positions, pads, copper traces, vias and layers.
+
+C. PHYSICAL PCB PHOTOGRAPH
+
+An actual photograph of an ECU circuit board showing visible components, markings and physical connections.
+
+D. CONNECTOR PINOUT DIAGRAM
+
+A connector drawing showing pin numbering and pin functions.
+
+E. TECHNICAL DOCUMENTATION
+
+A datasheet, service manual, circuit description, component specification or other technical reference.
+
+F. UNKNOWN OR MIXED DOCUMENT
+
+If the document cannot be classified reliably, request technician confirmation.
+
+The application must adapt its analysis workflow to the document type.
+
+Never treat a PCB photograph as a complete electrical schematic.
+
+Never assume visible physical proximity means electrical connectivity.
+
+# 4. AI IMAGE ANALYSIS ENGINE
+
+Integrate a vision-capable Gemini model through the existing secure server-side backend.
+
+The AI vision engine must analyze the uploaded document and identify:
+
+## Electronic components
+
+- Resistors.
+- Capacitors.
+- Electrolytic capacitors.
+- Ceramic capacitors.
+- Diodes.
+- Zener diodes.
+- TVS protection diodes.
+- Transistors.
+- MOSFETs.
+- IGBTs.
+- Voltage regulators.
+- DC-DC converters.
+- Operational amplifiers.
+- Comparators.
+- Microcontrollers.
+- EEPROM and memory ICs.
+- CAN transceivers.
+- LIN transceivers.
+- Injector driver ICs.
+- Ignition driver ICs.
+- Relay drivers.
+- Power management ICs.
+- Current-sensing resistors.
+- Inductors.
+- Transformers.
+- Crystal oscillators.
+- Fuses.
+- Connectors.
+- Test points.
+
+Also identify automotive-specific circuits:
+
+- 5V sensor reference circuits.
+- ECU battery supply circuits.
+- Ignition supply circuits.
+- Ground distribution.
+- Injector low-side and high-side drivers.
+- SCV driver circuits.
+- EGR driver circuits.
+- Turbo actuator drivers.
+- CKP/CMP signal conditioning.
+- MAP and MAF input circuits.
+- Rail pressure sensor circuits.
+- CAN-H and CAN-L circuits.
+- LIN communication circuits.
+- Reverse polarity protection.
+- Overvoltage protection.
+- Flyback protection.
+
+Only identify a component type when there is sufficient visual or documentary evidence.
+
+# 5. COMPONENT REFERENCE DESIGNATOR RECOGNITION
+
+Recognize and extract reference designators, including:
+
+- R1, R2, R103.
+- C1, C25, C301.
+- D1, D12.
+- Q1, Q5.
+- U1, U10.
+- IC1, IC2.
+- L1, L5.
+- F1, F2.
+- TP1, TP10.
+- J1, CN1, CON1.
+
+Read component markings using OCR and visual analysis.
+
+For every identified component, store:
+
+- Unique component ID.
+- Reference designator.
+- Component category.
+- Visible marking.
+- Detected value.
+- Manufacturer, if identifiable.
+- Part number, if identifiable.
+- Package type.
+- Physical location.
+- Bounding coordinates.
+- Associated circuit.
+- Connected terminals, when established.
+- Datasheet reference, if available.
+- Verification status.
+- Confidence score.
+- Source image and page number.
+
+Do not invent unreadable component markings.
+
+When OCR is uncertain, display the original marking and allow manual correction.
+
+# 6. INTERACTIVE IMAGE MAPPING ENGINE
+
+This is one of the most important features.
+
+Create an interactive mapping layer directly over the original uploaded image.
+
+The technician must be able to:
+
+- Zoom in and out.
+- Pan across the image.
+- Select individual components.
+- Highlight component boundaries.
+- Display reference designators.
+- Display component values.
+- Display pin and terminal labels.
+- Select PCB pads.
+- Select test points.
+- Highlight detected traces.
+- Display connected components.
+- Toggle component labels.
+- Toggle connection overlays.
+- Toggle verification indicators.
+- Hide or show individual analysis layers.
+
+Every detected component must have a selectable region.
+
+When a technician clicks a component, open a component inspection panel.
+
+The selected component must remain synchronized with the component database, circuit map and virtual instruments.
+
+Support accurate image-coordinate mapping across zooming, panning, resizing and mobile layouts.
+
+Store coordinates in the original image coordinate system.
+
+Never store only temporary screen coordinates.
+
+# 7. COMPONENT INSPECTION PANEL
+
+When a component is selected, display a detailed engineering information panel.
+
+Example:
+
+COMPONENT: R103
+
+Category: Resistor
+
+Visible Marking: 102
+
+Decoded Value: 1 kΩ
+
+Package: SMD, package identification pending
+
+Circuit Function: Not yet established
+
+Board Location: X and Y coordinates
+
+Connected Components: Only documented or verified connections
+
+Test Points: Associated test locations, if established
+
+Verification: CROSS-REFERENCED or UNVERIFIED
+
+Information sections:
+
+1. Identification.
+2. Component specifications.
+3. Pin or terminal information.
+4. Circuit function.
+5. Electrical connections.
+6. Datasheet.
+7. Expected test values.
+8. Common failure modes.
+9. Recommended test procedure.
+10. Technician notes.
+11. Source documentation.
+12. Verification history.
+
+All unknown fields must remain explicitly marked UNKNOWN or UNVERIFIED.
+
+# 8. AUTOMATIC CIRCUIT AND CONNECTION MAPPING
+
+Build an electrical connectivity extraction engine.
+
+For electrical schematics:
+
+- Detect wires and junctions.
+- Detect crossing wires and distinguish actual junctions from non-connected crossings.
+- Identify component terminals.
+- Identify ground symbols.
+- Identify power rails.
+- Identify signal nets.
+- Recognize net labels.
+- Recognize connector references.
+- Map connections between components.
+- Build a circuit graph.
+
+For PCB layouts:
+
+- Detect visible copper traces.
+- Detect pads.
+- Detect vias.
+- Detect trace junctions.
+- Detect component pads.
+- Detect visible board layers where supplied.
+- Associate component terminals with visible copper paths.
+
+For physical PCB photographs:
+
+- Detect visible components.
+- Detect readable markings.
+- Detect visible pads and traces where image quality allows.
+- Estimate component positions.
+- Identify visible physical connections only when supported by image evidence.
+
+Important:
+
+A normal PCB photograph cannot reliably reveal internal copper layers, hidden vias, buried traces or connections underneath components.
+
+Do not claim those connections are mapped unless additional board-layer documentation, X-ray imagery, netlists or other reliable sources establish them.
+
+Do not confuse visually overlapping traces with electrically connected traces.
+
+# 9. INTERACTIVE CIRCUIT TRACING
+
+Allow technicians to select a component terminal and activate TRACE CIRCUIT.
+
+The system should highlight the established electrical path.
+
+Example:
+
+ECU 12V INPUT
+→ Protection Diode
+→ Reverse Polarity Protection
+→ Power Management IC
+→ Voltage Regulator
+→ 5V Reference Output
+
+Another example:
+
+ECU INJECTOR DRIVER OUTPUT
+→ Gate Driver
+→ MOSFET
+→ Current-Sensing Resistor
+→ Injector Output Terminal
+
+These are examples of possible circuit structures, not universal ECU designs.
+
+Only display a complete trace when the underlying connections are established.
+
+When the trace is incomplete, show:
+
+CONNECTION PATH INCOMPLETE
+
+Highlight the known sections and identify missing information.
+
+Clicking any component in the path must open its component inspection panel.
+
+# 10. INTERACTIVE PCB AND SCHEMATIC SIMULATION
+
+Connect this scanner to the existing AutoElectric Lab Pro mathematical simulation engine.
+
+The user must be able to select a mapped component or circuit and launch a virtual test.
+
+Available virtual tests:
+
+## Resistors
+
+- Resistance.
+- Continuity.
+- Voltage drop.
+- Current calculation.
+
+## Capacitors
+
+- Capacitance.
+- Charging and discharging.
+- ESR, only when supported by a suitable model.
+- Short-circuit simulation.
+- Open-circuit simulation.
+
+## Diodes and Zener diodes
+
+- Forward voltage.
+- Reverse blocking.
+- Breakdown behavior within a documented or explicitly modeled range.
+- Open-circuit failure.
+- Short-circuit failure.
+
+## MOSFETs and transistors
+
+- Gate/base input behavior.
+- Drain/source or collector/emitter testing.
+- Switching behavior.
+- Gate or base drive simulation.
+- Shorted and open device faults.
+
+## Voltage regulators
+
+- Input voltage.
+- Output voltage.
+- Current loading.
+- Dropout behavior.
+- Thermal or current protection where modeled.
+
+## Automotive driver circuits
+
+- Injector driver switching.
+- Inductive flyback behavior.
+- Solenoid driver testing.
+- Relay driver operation.
+- PWM signal response.
+- Current-sensing circuit behavior.
+
+Each test must be driven by the component model and the actual extracted circuit topology.
+
+Do not create fake readings merely to make the interface look functional.
+
+If component values or circuit topology are missing, provide a clearly labeled hypothetical educational simulation.
+
+# 11. VIRTUAL PROBE INTEGRATION
+
+Integrate the mapped image with the existing Virtual Bench Lab.
+
+A technician should be able to:
+
+1. Select a test point directly on the uploaded image.
+2. Attach the virtual red probe.
+3. Attach the virtual black probe.
+4. Select DMM mode.
+5. Power the virtual circuit where appropriate.
+6. Observe the calculated measurement.
+7. Switch to oscilloscope mode.
+8. Observe the simulated signal.
+9. Introduce a fault.
+10. Observe the circuit response.
+
+Allow probes to snap to recognized pads, component terminals and test points.
+
+Show the selected probe location visually.
+
+Support multiple probe channels.
+
+The same simulation state must be shared by the scanner and Virtual Bench Lab.
+
+# 12. FAULT INJECTION AND FAILURE ANALYSIS
+
+Allow controlled virtual fault injection:
+
+- Open resistor.
+- Shorted resistor.
+- Open capacitor.
+- Shorted capacitor.
+- Shorted diode.
+- Open diode.
+- Shorted MOSFET.
+- Open MOSFET.
+- Broken PCB trace.
+- Corroded connection.
+- High-resistance joint.
+- Missing ground.
+- Short to ground.
+- Short to battery supply.
+- Missing supply voltage.
+- Failed voltage regulator.
+- Failed driver IC.
+
+Show how the injected fault changes:
+
+- Circuit voltage.
+- Current.
+- Power dissipation.
+- Signal waveform.
+- Component state.
+- Connected circuit behavior.
+
+Provide a diagnostic explanation based on the actual simulated circuit.
+
+Clearly label all injected faults as virtual.
+
+# 13. AI ENGINEERING ASSISTANT INTEGRATION
+
+The Gemini engineering assistant must understand the current scanner session.
+
+Pass the following contextual information when the technician asks a question:
+
+- Uploaded document.
+- Document classification.
+- ECU identification.
+- Selected component.
+- Component markings.
+- Component values.
+- Circuit graph.
+- Connected terminals.
+- Verification status.
+- Current test configuration.
+- DMM readings.
+- Oscilloscope readings.
+- Injected faults.
+- Technical references.
+
+Example user questions:
+
+"Where does the 5V reference originate?"
+
+"Trace the injector driver circuit."
+
+"What components are connected to this MOSFET?"
+
+"Where should I test the ECU power supply?"
+
+"What could cause this regulator to have no output?"
+
+"Show me the path from the ECU battery input to the 5V regulator."
+
+"Which components should I inspect if the CAN communication circuit is shorted?"
+
+The AI must distinguish between:
+
+- Verified information.
+- Extracted but unverified information.
+- Engineering interpretation.
+- Hypothetical simulation.
+- Unknown information.
+
+Never present an AI-generated guess as an established circuit fact.
+
+# 14. TECHNICAL DATASHEET AND DOCUMENTATION LIBRARY
+
+Allow technicians to attach component datasheets, ECU schematics, repair manuals and technical references to an uploaded PCB project.
+
+Match identified component part numbers to datasheets.
+
+Display:
+
+- Manufacturer.
+- Part number.
+- Package.
+- Pin configuration.
+- Electrical ratings.
+- Absolute maximum ratings.
+- Recommended operating conditions.
+- Functional description.
+- Relevant application circuits.
+
+Use the actual manufacturer's documentation where available.
+
+Never invent datasheet specifications.
+
+If no reliable datasheet is available, mark the component information UNVERIFIED.
+
+# 15. MULTI-IMAGE PCB RECONSTRUCTION
+
+Support multiple photographs of the same physical ECU board.
+
+For example:
+
+- PCB top side.
+- PCB bottom side.
+- Close-up of the power supply section.
+- Close-up of injector driver section.
+- Close-up of CAN transceiver section.
+- Close-up of connector terminals.
+
+Allow the technician to group images into one ECU board project.
+
+Create a board navigation system allowing the technician to move between images.
+
+Where image registration is possible, align corresponding board locations.
+
+Do not automatically combine different board revisions.
+
+Require confirmation when the images appear to show different ECU hardware versions.
+
+# 16. MANUAL CORRECTION AND ENGINEERING VERIFICATION
+
+AI extraction must never be treated as final truth without verification.
+
+Provide a manual correction system.
+
+Technicians must be able to:
+
+- Add a missing component.
+- Delete an incorrect detection.
+- Correct a reference designator.
+- Correct a component value.
+- Change a component type.
+- Move a component bounding box.
+- Correct a terminal location.
+- Add a missing net.
+- Correct a connection.
+- Mark a trace as unverified.
+- Confirm a connection after inspection.
+- Attach supporting evidence.
+
+Every manual correction must be recorded in an audit history.
+
+Store:
+
+- Previous value.
+- New value.
+- User action.
+- Timestamp.
+- Supporting evidence.
+- Verification status.
+
+Never silently overwrite original extracted information.
+
+# 17. VERIFICATION AND CONFIDENCE SYSTEM
+
+Use the following mandatory classifications:
+
+VERIFIED:
+Supported by an authoritative schematic, board layout, manufacturer documentation or directly confirmed technical evidence.
+
+CROSS-REFERENCED:
+Supported by multiple independent references, but not yet confirmed against the exact physical ECU revision.
+
+UNVERIFIED:
+Detected by AI vision or inferred from incomplete evidence without sufficient confirmation.
+
+UNKNOWN:
+Insufficient information to identify the component or connection.
+
+For every component, net and connection, record its evidence source separately.
+
+Display confidence scores for AI detection, but do not confuse an AI confidence score with engineering verification.
+
+A visually clear component can have high detection confidence but still have an unknown electrical function.
+
+# 18. PROJECT DATABASE AND DATA MODEL
+
+Create a structured data model for:
+
+- PCBProject.
+- UploadedDocument.
+- ImagePage.
+- BoardRevision.
+- DetectedComponent.
+- ComponentTerminal.
+- PCBPad.
+- PCBVia.
+- TraceSegment.
+- ElectricalNet.
+- CircuitNode.
+- CircuitEdge.
+- SchematicSymbol.
+- Connector.
+- TestPoint.
+- ComponentSpecification.
+- DatasheetReference.
+- VerificationRecord.
+- SimulationModel.
+- FaultInjection.
+- MeasurementRecord.
+- TechnicianAnnotation.
+
+All relationships must have stable IDs.
+
+Keep original images, extracted information, manually corrected information and simulation data separate.
+
+Provide project saving and reopening.
+
+# 19. PERFORMANCE AND IMAGE ACCURACY
+
+Support high-resolution image analysis.
+
+Implement:
+- Image tiling for large documents.
+- High-resolution zoom.
+- Image coordinate normalization.
+- OCR correction.
+- Region-based reanalysis.
+- Background analysis jobs for large documents.
+- Processing progress.
+- Error recovery.
+- Duplicate component detection.
+- Duplicate document detection.
+
+Allow the technician to select a small image region and request a more detailed analysis without reprocessing the entire document.
+
+Never silently discard image details.
+
+# 20. USER INTERFACE
+
+Add a new navigation module:
+
+SCHEMATIC / PCB SCANNER
+
+Use the existing AutoElectric Lab Pro dark industrial laboratory design.
+
+The main screen should have:
+
+LEFT PANEL:
+- Uploaded document library.
+- ECU and PCB identification.
+- Document pages.
+- Image layers.
+- Component list.
+- Circuit list.
+
+CENTER WORKSPACE:
+- Original uploaded image.
+- Zoom and pan.
+- Interactive component overlays.
+- PCB pad and trace overlays.
+- Circuit highlighting.
+- Probe placement.
+- Selection tools.
+
+RIGHT PANEL:
+- Component information.
+- Reference designator.
+- Part number.
+- Specifications.
+- Circuit function.
+- Verification status.
+- Datasheet.
+- Test procedures.
+- Simulation controls.
+
+BOTTOM PANEL:
+- Circuit connectivity.
+- Component test results.
+- Virtual instrument readings.
+- AI diagnostic explanations.
+- Verification history.
+
+Include mobile responsive behavior without sacrificing the desktop engineering workspace.
+
+# 21. IMPLEMENTATION ARCHITECTURE
+
+Integrate the module into the existing React and TypeScript architecture.
+
+Use:
+
+- Gemini vision capabilities for image understanding.
+- OCR for component markings.
+- Computer vision for image regions and trace detection.
+- SVG or Canvas overlays for interactive image mapping.
+- A structured circuit graph for electrical connectivity.
+- A deterministic mathematical engine for circuit simulation.
+- Server-side API calls for Gemini.
+- The existing project database where suitable.
+
+Use the existing application backend.
+
+Do not expose Gemini API keys in frontend code.
+
+Separate image analysis, document storage, circuit extraction, component data, verification and simulation into independent services.
+
+Do not replace existing working modules.
+
+# 22. ENGINEERING SAFETY
+
+This module is for technical documentation, circuit analysis and virtual simulation.
+
+It must not automatically claim that a physical ECU board has passed testing.
+
+Do not recommend applying voltage to unidentified PCB terminals.
+
+Before any physical testing procedure is presented, require documented pin or terminal identification and appropriate test conditions.
+
+Clearly distinguish virtual measurements from physical measurements.
+
+Provide warnings for high-voltage, high-current, inductive and sensitive microcontroller circuits.
+
+Do not allow an AI-generated pinout or inferred PCB connection to be used as a verified physical test instruction.
+
+# 23. REQUIRED ACCEPTANCE TESTS
+
+The feature is not complete until the following scenarios are tested:
+
+TEST 1:
+Upload a clear electrical schematic and identify its symbols, component references and net labels.
+
+TEST 2:
+Select a resistor on the original image and display its detected value and reference designator.
+
+TEST 3:
+Select a diode and display its detected orientation where the symbol or physical markings establish it.
+
+TEST 4:
+Trace a documented circuit path between two selected terminals.
+
+TEST 5:
+Upload a PCB photograph and map visible components without inventing hidden connections.
+
+TEST 6:
+Upload front and back PCB photographs and create a multi-image project.
+
+TEST 7:
+Select a verified test point and connect a virtual multimeter.
+
+TEST 8:
+Change a circuit component value and verify that the simulated voltage and current change mathematically.
+
+TEST 9:
+Inject a virtual open-circuit fault and observe the resulting circuit behavior.
+
+TEST 10:
+Manually correct an incorrect component identification and verify that the audit history records the change.
+
+TEST 11:
+Save the PCB project, close it, reopen it and confirm that all mappings and annotations are preserved.
+
+TEST 12:
+Export a technical report containing the original image, component map, connectivity information, verification status and test results.
+
+# 24. FINAL IMPLEMENTATION REQUIREMENTS
+
+This must be a genuinely functional engineering module, not a static mockup.
+
+Do not merely create clickable-looking component labels.
+
+Every interactive component must be connected to its actual data record.
+
+Every trace must be based on extracted or documented connectivity.
+
+Every simulation result must be calculated by the deterministic simulation engine.
+
+Every technical specification must have a traceable source or be marked UNVERIFIED.
+
+Do not generate fictional ECU board layouts or claim that an unknown physical PCB has been fully mapped.
+
+Implement the feature incrementally:
+
+PHASE A: Image upload, classification and document viewer.
+
+PHASE B: Component detection, OCR and interactive overlays.
+
+PHASE C: PCB pad, trace and schematic connectivity extraction.
+
+PHASE D: Circuit graph and interactive tracing.
+
+PHASE E: Component information and datasheet integration.
+
+PHASE F: Virtual probes and electrical simulation.
+
+PHASE G: Fault injection and AI engineering assistant.
+
+PHASE H: Manual verification, project saving and reporting.
+
+After each phase, compile and test the application before continuing.
+
+At completion, provide a detailed implementation report listing:
+
+- Features actually implemented.
+- Features successfully tested.
+- Image types supported.
+- Components successfully recognized.
+- Connectivity extraction limitations.
+- Simulation capabilities.
+- Accuracy and verification limitations.
+- Remaining work.
+
+**FINAL DIRECTIVE: Build a professional automotive ECU schematic and PCB intelligence platform where technicians can inspect the actual uploaded circuit image, select real mapped components, trace documented electrical connections and perform meaningful virtual tests. Engineering evidence and accuracy take priority over visual effects and AI-generated assumptions.**
+
+### 2\. What the finished feature should look like
+
+This is the workflow I want the application to achieve:
+
+### Schematic & PCB Scanner workflow
+
+* Upload actual ECU documentation
+
+    ![Guia de Centrais Automotivas - Carrotec](https://images.openai.com/static-rsc-4/yv2HkeW58S5iHxFdDHuoyE7C3rzzHPnIEYyycyd7H346ReHv69jHTla2DinGU_ETOEQDeVZJi6Wab2jjDvozTuub8boFJvJZpXmfVwHg9gfFIxnFNNg9MS88d2dq3-2kZX5hU3_IMm0q3XDjv5Z2TZoXRH6GrAgfNp0rkPaHdkL9ISr1X4z5ntYpz_RNsfdK?purpose=fullsize)
+
+    Upload the actual PCB photograph, schematic, or PCB layout.
+
+* AI identifies and maps components
+
+    ![Example of PCB image with annotated components and other PCB elements. | Download Scientific Diagram](https://images.openai.com/static-rsc-4/0C2NeCUlaPTnOZ1SokWpyis8lzIzw7DJjBL2fGAKlVqnVxBbqjktfDmJHRcViRmEaYUGMxE2SMAyKjDJW3R1rCk5gs9q1lh858F2kguEJf67pN6ugeeyHicp99F1VS3L4QbcrHLpKDsf3kjmI41xAKdNU-oYagxIkHbcgUxYaZZNWLWvqlfz9BP5BexmZJZG?purpose=fullsize)
+
+    Detect components, reference designators, markings, pads and visible connections.
+
+* Select a component on the original image
+
+    ![Cross-Probe & Cross-Select Tools | Altium CircuitStudio Technical Documentation](https://images.openai.com/static-rsc-4/b_KOOZa7SCVoRlQQQu0_EiNvC5F8_VxVkLspuPucPTZ14IFWxDh4FoVkneUR-PyJzL5jgTAUWEY1dKFYmJOwqrDBq4DWx7Pq-Dpu5bR9zEM1txYYsRqbydykzbCW1QbNWqF_oli5ILYBD-AKBsIOHmXmCClqE2Ck-XlfLUwEyhJaANG1NzNZgbwWVFlthP4W?purpose=fullsize)
+
+    Click R103, Q5, U1 or a test point to open its technical information.
+
+* Trace the circuit
+
+    ![Grand Idea Studio: PCB Deconstruction Techniques](https://images.openai.com/static-rsc-4/18_dyJcie2QUjpyQkXphMAFcHn7TGPF2zG3QIiKdYOc3iQ07dy_BIsouksR3Qz74IDa2AgW3vQxXXoHegznUG7k4xeJ1OnIW1X8nkKdZlpmoMDnsNhDYLhMvDPREA7wNz5DQDxdZPxGjzygrwCntPJMeUgfeGYDsbSv8TuzedQTsDawv6Qfnc6uCELp0J62F?purpose=fullsize)
+
+    Highlight documented connections between components.
+
+* Perform virtual measurements
+
+    ![Composants électroniques. Distributeur et magasin en ligne Transfer Multisort Elektronik France](https://images.openai.com/static-rsc-4/0AJEAeqx2ViMwvMOrhNwh8skPgP-xvW7FwW_efvVS1IUjGJcJddDfhL_tVjLWTVuC1R461H3j9li-VtizFzCGr0b8bzYmHF_0mQ34hHljB3ohNm0QdZZvXbDa2294sEYbXpc6szdOedsJS8vIgxy34AxWpMMxsYM2WbHTQDMXkHQMdEqL6SZKJGMdS2noKru?purpose=fullsize)
+
+    Connect the virtual probes and observe calculated circuit measurements.
+
+### 3\. One additional capability I strongly recommend
+
+Add a feature called ECU Board Comparison & Revision Detection.
+
+This would let a technician upload two ECU boards and compare their layouts:
+
+* Component differences.
+
+* Missing or additional components.
+
+* Different IC markings.
+
+* Changed resistor and capacitor values.
+
+* Different connector arrangements.
+
+* Changed PCB trace routing, where visible.
+
+* Different board revisions.
+
+This is particularly useful when repairing an ECU without an available schematic, or comparing a damaged board against a known-good board.
+
+My recommendation: Build the scanner in phases, starting with image upload, component detection and accurate interactive overlays. Only then enable circuit tracing and simulation. This prevents the application from drawing convincing but electrically incorrect circuit paths.
+
+The most important feature is not simply recognizing a MOSFET or resistor. It is being able to click that exact component on the uploaded ECU image, identify its terminals, establish its documented connections, and test it through the same virtual instruments already present in your Bench Lab.
