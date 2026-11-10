@@ -161,3 +161,5 @@ export class LayerManagerService {
     };
   }
 }
+
+export const LayerManager = LayerManagerService;

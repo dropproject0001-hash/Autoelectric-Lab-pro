@@ -8,6 +8,7 @@ import {
 } from '../types/pcbScanner';
 import { SAMPLE_PCB_PROJECTS } from '../data/samplePcbDatabase';
 import { PcbStorageEngine } from '../services/pcbStorageEngine';
+import { LayerManager } from '../services/pcbLayerManagerService';
 import { usePcbLayerManager } from '../hooks/usePcbLayerManager';
 import { PcbCanvasOverlay } from './PcbCanvasOverlay';
 import { FloatingComponentHud } from './FloatingComponentHud';
