@@ -67,7 +67,7 @@ export const SchematicPcbScanner: React.FC<SchematicPcbScannerProps> = ({
     handleZoom,
     resetZoomAndPan,
     updatePan,
-  } = usePcbLayerManager();
+  } = usePcbLayerManager(activeProjectId);
 
   // Selection state
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
